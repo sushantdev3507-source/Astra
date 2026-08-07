@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ASTRA Photo Editor</title>
+
+<link rel="stylesheet" href="css/photo-editor.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+
+<div class="editor-container">
+
+    <!-- LEFT SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <h2>ASTRA</h2>
+
+        </div>
+
+        <nav>
+
+            <button id="uploadImage">
+                <i class="fa-solid fa-image"></i>
+                Image
+            </button>
+
+            <button id="replaceImage">
+
+                <i class="fa-solid fa-repeat"></i>
+
+                Replace
+
+            </button>
+            <button id="duplicateImage">
+
+                <i class="fa-solid fa-copy"></i>
+
+                Duplicate
+
+            </button>
+            <button id="deleteImage">
+
+                <i class="fa-solid fa-trash"></i>
+
+                Delete
+
+            </button>
+            <button id="fitCanvas">
+                
+                <i class="fa-solid fa-expand"></i>
+                Fit Canvas
+            </button>
+            <button id="setBackground">
+                <i class="fa-solid fa-fill"></i>
+                Background
+            </button>
+
+            <button id="addHeading">
+                <i class="fa-solid fa-heading"></i>
+                Heading
+            </button>
+
+            <button id="addParagraph">
+                <i class="fa-solid fa-paragraph"></i>
+                Paragraph
+            </button>
+
+            <button id="addRectangle">
+                <i class="fa-regular fa-square"></i>
+                Rectangle
+            </button>
+
+            <button id="addCircle">
+                <i class="fa-regular fa-circle"></i>
+                Circle
+            </button>
+
+            <button id="addTriangle">
+                <i class="fa-solid fa-play"></i>
+                Triangle
+            </button>
+
+            <button id="addLine">
+                <i class="fa-solid fa-minus"></i>
+                Line
+            </button>
+
+            <button id="addRoundedRect">
+                <i class="fa-regular fa-square-full"></i>
+                Rounded
+            </button>
+
+            <button id="addStar">
+                <i class="fa-solid fa-star"></i>
+                Star
+            </button>
+
+            <button id="addArrow">
+                <i class="fa-solid fa-arrow-right"></i>
+                Arrow
+            </button>
+            <button id="brushTool">
+
+                <i class="fa-solid fa-paintbrush"></i>
+
+                Brush
+
+            </button>
+
+            <button id="penTool">
+
+                <i class="fa-solid fa-pen"></i>
+
+                Pen
+
+            </button>
+
+            <button id="finishPen">
+
+                Finish Path
+
+            </button>
+
+            <button id="eraserTool">
+
+                <i class="fa-solid fa-eraser"></i>
+
+                Eraser
+
+            </button>
+            <button id="cropTool">
+
+                <i class="fa-solid fa-crop"></i>
+
+                Crop
+
+            </button>
+            <button id="filtersTool">
+
+                <i class="fa-solid fa-sliders"></i>
+
+                Filters
+
+            </button>
+
+            <button id="aiTools">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                AI Tools
+            </button>
+
+            <button id="openTemplates">
+
+                <i class="fa-solid fa-layer-group"></i>
+
+                Templates
+
+            </button>
+
+            <button id="frameTool">
+
+                <i class="fa-regular fa-square"></i>
+
+                Frames
+
+            </button>
+
+            
+            <button id="exportPNG">
+                PNG
+            </button>
+
+            <button id="exportJPG">
+                JPG
+            </button>
+
+            <button id="exportPDF">
+                PDF
+            </button>
+
+            <button id="saveProject">
+                Save
+            </button>
+
+            <button id="openProject">
+                Open
+            </button>
+
+            <button id="printCanvas">
+                Print
+            </button>
+
+            <input
+            type="file"
+            id="projectFile"
+            accept=".astra"
+            hidden>
+
+            <hr>
+
+<div class="pages-panel">
+
+    <h3>Pages</h3>
+
+    <div class="page-item">
+
+    <canvas class="page-preview"></canvas>
+
+    <span>Page 1</span>
+
+    <div class="page-actions">
+
+        <button class="duplicate-page">
+            <i class="fa-solid fa-copy"></i>
+        </button>
+
+        <button class="delete-page">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+
+    </div>
+
+</div>
+
+    <button id="addPage">
+
+        <i class="fa-solid fa-plus"></i>
+
+        Add Page
+
+    </button>
+    <button id="eyedropperTool">
+
+    <i class="fa-solid fa-eye-dropper"></i>
+
+    Eyedropper
+
+</button>
+
+</div>
+
+        </nav>
+
+    </aside>
+
+    <!-- MAIN -->
+
+    <div class="main-area">
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <div class="left">
+
+                <button id="undoBtn">
+
+                    <i class="fa-solid fa-arrow-rotate-left"></i>
+
+                </button>
+
+                <button id="redoBtn">
+
+                    <i class="fa-solid fa-arrow-rotate-right"></i>
+
+                </button>
+                <button id="clearRecovery">
+
+                    Clear Recovery
+
+                </button>
+
+            </div>
+
+            <h2>ASTRA Photo Editor</h2>
+
+            <div class="right">
+
+                <button id="saveBtn">
+
+                    Save
+
+                </button>
+
+                <button id="exportBtn">
+
+                    Export
+
+                </button>
+
+                <button id="zoomOutBtn">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+
+                <span id="zoomValue">100%</span>
+
+                <button id="zoomInBtn">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <button id="toggleGrid">
+
+                    Grid
+
+                </button>
+            </div>
+
+        </header>
+
+        <!-- CANVAS -->
+
+        <div class="workspace">
+
+    <div class="canvas-container">
+
+        <canvas id="editorCanvas"></canvas>
+
+    </div>
+
+</div>
+
+    </div>
+
+    <!-- RIGHT PANEL -->
+
+    <aside class="properties">
+
+        <h3>Properties</h3>
+
+        <div id="propertyContent">
+            <label>Fill</label>
+
+            <input type="color" id="shapeFill">
+
+            <label>Stroke</label>
+
+            <input type="color" id="shapeStroke">
+
+            <label>Stroke Width</label>
+
+            <input
+            type="range"
+            id="shapeStrokeWidth"
+            min="0"
+            max="20"
+            value="2">
+
+    <label>Fill Color</label>
+
+    <input type="color" id="fillColor" value="#4f46e5">
+     <hr>
+
+<h3>Gradient</h3>
+
+<label>Gradient Type</label>
+
+<select id="gradientType">
+
+<option value="linear">Linear</option>
+
+<option value="radial">Radial</option>
+
+</select>
+
+<label>Color 1</label>
+
+<input
+type="color"
+id="gradientColor1"
+value="#4f46e5">
+
+<label>Color 2</label>
+
+<input
+type="color"
+id="gradientColor2"
+value="#06b6d4">
+
+<label>Angle</label>
+
+<input
+type="range"
+id="gradientAngle"
+min="0"
+max="360"
+value="0">
+
+<button id="applyGradient">
+
+Apply Gradient
+
+</button> 
+<hr>
+
+<h3>Shadow Effects</h3>
+
+<label>Enable Shadow</label>
+
+<input type="checkbox" id="enableShadow">
+
+<label>Shadow Color</label>
+
+<input
+type="color"
+id="shadowColor"
+value="#000000">
+
+<label>Blur</label>
+
+<input
+type="range"
+id="shadowBlur"
+min="0"
+max="100"
+value="20">
+
+<label>Offset X</label>
+
+<input
+type="range"
+id="shadowOffsetX"
+min="-100"
+max="100"
+value="10">
+
+<label>Offset Y</label>
+
+<input
+type="range"
+id="shadowOffsetY"
+min="-100"
+max="100"
+value="10">
+
+<button id="applyShadow">
+
+Apply Shadow
+
+</button>
+
+<button id="removeShadow">
+
+Remove Shadow
+
+</button>
+<hr>
+
+<h3>Glow Effect</h3>
+
+<label>Enable Glow</label>
+
+<input
+type="checkbox"
+id="enableGlow">
+
+<label>Glow Color</label>
+
+<input
+type="color"
+id="glowColor"
+value="#00ffff">
+
+<label>Glow Size</label>
+
+<input
+type="range"
+id="glowBlur"
+min="0"
+max="120"
+value="40">
+
+<button id="applyGlow">
+
+Apply Glow
+
+</button>
+
+<button id="removeGlow">
+
+Remove Glow
+
+</button>
+
+    <label>Stroke Color</label>
+
+    <input type="color" id="strokeColor" value="#000000">
+
+    <label>Stroke Width</label>
+
+    <input
+        type="range"
+        id="strokeWidth"
+        min="0"
+        max="20"
+        value="2">
+
+    <label>Opacity</label>
+
+    <input
+        type="range"
+        id="opacity"
+        min="0"
+        max="100"
+        value="100">
+
+    <label>Rotation</label>
+
+    <input
+        type="range"
+        id="rotation"
+        min="0"
+        max="360"
+        value="0">
+
+        <label>Brightness</label>
+
+<input
+type="range"
+id="brightness"
+min="-1"
+max="1"
+step="0.05"
+value="0">
+
+<label>Contrast</label>
+
+<input
+type="range"
+id="contrast"
+min="-1"
+max="1"
+step="0.05"
+value="0">
+
+<label>Saturation</label>
+
+<input
+type="range"
+id="saturation"
+min="-1"
+max="1"
+step="0.05"
+value="0">
+
+<label>Blur</label>
+
+<input
+type="range"
+id="blur"
+min="0"
+max="1"
+step="0.05"
+value="0">
+
+<div class="filter-buttons">
+
+<button id="grayBtn">
+
+Grayscale
+
+</button>
+
+<button id="sepiaBtn">
+
+Sepia
+
+</button>
+
+<button id="invertBtn">
+
+Invert
+
+</button>
+
+<button id="resetFilters">
+
+Reset Filters
+
+</button>
+
+</div>
+<hr>
+
+<h3>Text</h3>
+
+<label>Font</label>
+
+<select id="fontFamily">
+
+    <option>Poppins</option>
+
+    <option>Arial</option>
+
+    <option>Verdana</option>
+
+    <option>Georgia</option>
+
+    <option>Times New Roman</option>
+
+</select>
+
+<label>Font Size</label>
+
+<input
+type="range"
+id="fontSize"
+min="12"
+max="120"
+value="40">
+
+<label>Font Color</label>
+
+<input
+type="color"
+id="fontColor"
+value="#000000">
+
+<div class="text-actions">
+
+<button id="boldBtn">
+
+B
+
+</button>
+
+<button id="italicBtn">
+
+I
+
+</button>
+
+<button id="underlineBtn">
+
+U
+
+</button>
+
+</div>
+
+<label>Alignment</label>
+
+<select id="textAlign">
+
+<option value="left">Left</option>
+
+<option value="center">Center</option>
+
+<option value="right">Right</option>
+<hr>
+
+<h3>Brush Settings</h3>
+
+<label>Brush Color</label>
+
+<input
+type="color"
+id="brushColor"
+value="#000000">
+
+<label>Brush Size</label>
+
+<input
+type="range"
+id="brushSize"
+min="1"
+max="100"
+value="5">
+
+<button id="disableBrush">
+
+Exit Draw Mode
+
+</button>
+<hr>
+
+<h3>Picked Color</h3>
+
+<input
+type="color"
+id="pickedColor"
+value="#000000">
+
+<button id="applyPickedColor">
+
+Apply Color
+
+</button>
+</select>
+
+    <button id="applyCrop">
+
+    Apply Crop
+
+</button>
+
+<button id="cancelCrop">
+
+    Cancel Crop
+
+</button>
+    
+    <button id="duplicateBtn">
+
+        Duplicate
+
+    </button>
+
+    <button id="deleteBtn">
+
+        Delete
+
+    </button>
+    <hr>
+
+<div class="layers-section">
+
+    <h3>Layers</h3>
+
+    <div id="layersList"></div>
+
+    <div class="layer-buttons">
+
+        <button id="layerFront">
+            ⬆ Front
+        </button>
+
+        <button id="layerBack">
+            ⬇ Back
+        </button>
+
+        <button id="layerDuplicate">
+            📄 Duplicate
+        </button>
+
+        <button id="layerDelete">
+            🗑 Delete
+        </button>
+
+    </div>
+
+</div>
+
+</div>
+    </aside>
+
+</div>
+
+<input
+type="file"
+id="imageInput"
+accept="image/*"
+hidden>
+
+
+
+<script src="js/canvas.js"></script>
+
+<script src="js/image.js"></script>
+
+<script src="js/text.js"></script>
+
+<script src="js/shapes.js"></script>
+
+<script src="js/filters.js"></script>
+
+<script src="js/layers.js"></script>
+
+<script src="js/history.js"></script>
+
+<script src="js/export.js"></script>
+
+<script src="js/brush.js"></script>
+
+<script src="js/pen.js"></script>
+
+<script src="js/eyedropper.js"></script>
+
+<script src="js/gradient.js"></script>
+
+<script src="js/shadow.js"></script>
+
+<script src="js/glow.js"></script>
+
+<script src="js/frame.js"></script>
+
+<script src="js/pages.js"></script>
+
+<script src="js/templates.js"></script>
+
+<script src="js/keyboard.js"></script>
+
+<script src="js/context-menu.js"></script>
+
+<script src="js/autosave.js"></script>
+
+<script src="js/crop.js"></script>
+
+<script src="js/smart-guides.js"></script>
+
+<script src="js/ui.js"></script>
+
+<script src="js/app.js"></script>
+
+
+<div id="contextMenu" class="context-menu">
+
+    <button id="ctxCopy">
+        <i class="fa-solid fa-copy"></i>
+        Copy
+    </button>
+
+    <button id="ctxPaste">
+        <i class="fa-solid fa-paste"></i>
+        Paste
+    </button>
+
+    <button id="ctxDuplicate">
+        <i class="fa-solid fa-clone"></i>
+        Duplicate
+    </button>
+
+    <button id="ctxDelete">
+        <i class="fa-solid fa-trash"></i>
+        Delete
+    </button>
+
+    <hr>
+
+    <button id="ctxFront">
+        ⬆ Bring To Front
+    </button>
+
+    <button id="ctxBack">
+        ⬇ Send To Back
+    </button>
+
+</div>
+<div id="templatePanel" class="template-panel">
+
+    <div class="template-header">
+
+        <h2>Templates</h2>
+
+        <button id="saveTemplateBtn">
+
+            <i class="fa-solid fa-floppy-disk"></i>
+
+            Save Current Design
+
+        </button>
+
+        <button id="closeTemplates">
+            ✖
+
+        </button>
+
+    </div>
+
+    <div class="template-categories">
+
+        <button data-type="instagram">
+
+            Instagram
+
+        </button>
+
+        <button data-type="youtube">
+
+            YouTube
+
+        </button>
+
+        <button data-type="facebook">
+
+            Facebook
+
+        </button>
+
+        <button data-type="poster">
+
+            Poster
+
+        </button>
+        <button data-type="custom">
+
+            Custom
+
+        </button>
+
+    </div>
+
+    <div id="templateList"></div>
+
+</div>
+<div id="framePanel" class="frame-panel">
+
+    <div class="frame-header">
+
+        <h2>Frames</h2>
+
+        <button id="closeFramePanel">
+
+            ✖
+
+        </button>
+
+    </div>
+
+    <div class="frame-grid">
+
+        <button class="frame-btn" data-frame="rectangle">
+            Rectangle
+        </button>
+
+        <button class="frame-btn" data-frame="circle">
+            Circle
+        </button>
+
+        <button class="frame-btn" data-frame="rounded">
+            Rounded
+        </button>
+
+    </div>
+
+</div>
+</body>
+
+</html>
