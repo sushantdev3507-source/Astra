@@ -1,6 +1,4 @@
-// ============================
-// ASTRA Gradient Tool
-// ============================
+
 
 const gradientBtn = document.getElementById("applyGradient");
 gradientBtn.onclick = function(){

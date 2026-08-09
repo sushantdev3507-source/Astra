@@ -1,6 +1,3 @@
-// ============================
-// ASTRA Layers Manager
-// ============================
 
 const layersList=document.getElementById("layersList");
 

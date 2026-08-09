@@ -1,6 +1,4 @@
-// ============================
-// ASTRA Brush Tool
-// ============================
+
 
 const brushBtn=document.getElementById("brushTool");
 

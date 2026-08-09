@@ -1,6 +1,4 @@
-// ==============================
-// ASTRA History Manager
-// ==============================
+
 
 const history = {
     undoStack: [],

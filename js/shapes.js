@@ -1,6 +1,4 @@
-// =============================
-// ASTRA Shapes Manager
-// =============================
+
 
 function addShape(shape){
 

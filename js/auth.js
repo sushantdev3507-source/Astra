@@ -1,6 +1,4 @@
-// ==============================
-// Tabs
-// ==============================
+
 
 const signinTab = document.getElementById("signinTab");
 const signupTab = document.getElementById("signupTab");
@@ -28,9 +26,6 @@ signupTab.onclick = () => {
 
 };
 
-// ==============================
-// Password Toggle
-// ==============================
 
 function togglePassword(inputId, buttonId){
 
@@ -66,9 +61,7 @@ togglePassword("password","togglePassword");
 togglePassword("signupPassword","toggleSignupPassword");
 togglePassword("confirmPassword","toggleConfirmPassword");
 
-// ==============================
-// Validation
-// ==============================
+
 
 signinForm.addEventListener("submit",(e)=>{
 

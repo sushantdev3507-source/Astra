@@ -1,6 +1,4 @@
-// ==========================
-// Text Manager
-// ==========================
+
 
 const headingBtn=document.getElementById("addHeading");
 

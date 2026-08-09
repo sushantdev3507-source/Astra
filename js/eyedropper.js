@@ -1,6 +1,4 @@
-// ==========================
-// ASTRA Eyedropper
-// ==========================
+
 
 let eyeDropperMode = false;
 document.getElementById("eyedropperTool")

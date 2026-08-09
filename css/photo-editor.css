@@ -1,6 +1,4 @@
-/* ==========================
-   RESET
-========================== */
+
 
 *{
     margin:0;
@@ -26,9 +24,7 @@ body{
     overflow:hidden;
 }
 
-/* ==========================
-   SIDEBAR
-========================== */
+
 
 .sidebar{
     width:90px;
@@ -97,9 +93,7 @@ border-radius:14px;
     background:#2563eb;
 }
 
-/* ==========================
-   CENTER
-========================== */
+
 
 .main-area{
     flex:1;
@@ -108,9 +102,7 @@ border-radius:14px;
     overflow:hidden;
 }
 
-/* ==========================
-   TOPBAR
-========================== */
+
 
 .topbar{
 
@@ -207,9 +199,7 @@ canvas{
     height:auto;
 }
 
-/* ==========================
-   RIGHT PANEL
-========================== */
+
 
 .properties{
 
@@ -503,9 +493,7 @@ border-top:1px solid rgba(255,255,255,.08);
 margin:8px 0;
 
 }
-/* ==========================
-   PAGES
-========================== */
+
 
 .pages-panel{
 
@@ -627,9 +615,7 @@ border-radius:8px;
 cursor:pointer;
 
 }
-/* ==========================
-   TEMPLATE PANEL
-========================== */
+
 
 .template-panel{
 
@@ -803,9 +789,7 @@ border-radius:8px;
 cursor:pointer;
 
 }
-/* ==========================
-   FRAME PANEL
-========================== */
+
 
 .frame-panel{
 

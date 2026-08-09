@@ -1,6 +1,4 @@
-// ============================
-// ASTRA Keyboard Shortcuts
-// ============================
+
 
 let copiedObject = null;
 function copyObject() {

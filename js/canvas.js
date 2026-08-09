@@ -1,6 +1,4 @@
-// ===============================
-// ASTRA Canvas Manager
-// ===============================
+
 
 const canvas = new fabric.Canvas("editorCanvas", {
     width: 1200,

@@ -7,7 +7,7 @@
     }
 
 }
-/* HERO */
+
 
 @media(max-width:992px){
 
@@ -89,7 +89,7 @@ transform:translate(0,0);
 }
 
 }
-/* FEATURES */
+
 
 @media(max-width:992px){
 
@@ -106,7 +106,6 @@ transform:translate(0,0);
 }
 
 }
-/* WHY ASTRA */
 
 @media(max-width:992px){
 
@@ -135,7 +134,7 @@ font-size:38px;
 }
 
 }
-/* STATS */
+
 
 @media(max-width:992px){
 
@@ -177,7 +176,7 @@ grid-template-columns:1fr;
 }
 
 }
-/* WORKSPACE */
+
 
 @media(max-width:992px){
 

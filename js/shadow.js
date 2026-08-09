@@ -1,6 +1,4 @@
-// ============================
-// ASTRA Shadow Tool
-// ============================
+
 
 const applyShadowBtn=document.getElementById("applyShadow");
 

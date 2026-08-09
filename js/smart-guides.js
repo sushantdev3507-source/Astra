@@ -1,6 +1,4 @@
-// ===============================
-// ASTRA Smart Guides
-// ===============================
+
 let verticalGuide = null;
 let horizontalGuide = null;
 const OBJECT_SNAP_DISTANCE = 8;

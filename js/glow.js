@@ -1,6 +1,3 @@
-// =========================
-// ASTRA Glow Tool
-// =========================
 
 const glowBtn=document.getElementById("applyGlow");
 

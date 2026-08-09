@@ -1,6 +1,4 @@
-// ====================================
-// ASTRA Image Manager
-// ====================================
+
 
 const imageInput = document.getElementById("imageInput");
 const uploadBtn = document.getElementById("uploadImage");

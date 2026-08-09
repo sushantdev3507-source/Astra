@@ -1,6 +1,4 @@
-// ==========================
-// ASTRA Auto Save
-// ==========================
+
 
 const AUTO_SAVE_KEY = "ASTRA_AUTOSAVE";
 

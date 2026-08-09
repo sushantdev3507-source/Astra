@@ -1,6 +1,6 @@
 let cropRect = null;
 let cropMode = false;
-// Fabric Canvas
+
 
 const canvas = new fabric.Canvas("editorCanvas",{
 
@@ -14,7 +14,7 @@ preserveObjectStacking:true
 
 });
 
-// Upload Image
+
 
 const uploadBtn=document.getElementById("uploadImage");
 
@@ -55,9 +55,7 @@ canvas.renderAll();
 reader.readAsDataURL(file);
 
 };
-// ======================
-// ADD HEADING
-// ======================
+
 
 document.getElementById("addHeading").onclick = () => {
 
@@ -83,9 +81,7 @@ document.getElementById("addHeading").onclick = () => {
 
 };
 
-// ======================
-// ADD PARAGRAPH
-// ======================
+
 
 document.getElementById("addParagraph").onclick = () => {
 

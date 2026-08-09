@@ -1,6 +1,4 @@
-// ===========================
-// ASTRA Templates
-// ===========================
+
 if(type==="custom"){
 
 const saved=JSON.parse(
