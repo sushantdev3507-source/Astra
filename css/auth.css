@@ -1,0 +1,446 @@
+/*=========================
+RESET
+=========================*/
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:'Poppins',sans-serif;
+
+    background:#06111f;
+
+    color:white;
+
+}
+
+/*=========================
+AUTH
+=========================*/
+
+.auth-container{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    min-height:100vh;
+
+}
+
+/* LEFT */
+
+.left-panel{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    flex-direction:column;
+
+    padding:80px;
+
+    background:linear-gradient(135deg,#081b32,#0f2e56);
+
+}
+
+.left-panel img{
+
+    width:180px;
+
+    margin-bottom:40px;
+
+}
+
+.left-panel h1{
+
+    font-size:54px;
+
+    text-align:center;
+
+}
+
+.left-panel h2{
+
+    margin-top:10px;
+
+    color:#42d9ff;
+
+    font-size:40px;
+
+}
+
+.left-panel p{
+
+    margin-top:30px;
+
+    max-width:520px;
+
+    text-align:center;
+
+    line-height:1.8;
+
+    color:#c8d6ea;
+
+}
+
+/* RIGHT */
+
+.right-panel{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:40px;
+
+}
+
+.auth-card{
+
+    width:100%;
+
+    max-width:480px;
+
+    background:rgba(255,255,255,.05);
+
+    backdrop-filter:blur(20px);
+
+    border-radius:24px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    padding:45px;
+
+}
+
+/* Tabs */
+
+.tabs{
+
+    display:flex;
+
+    gap:10px;
+
+}
+
+.tab{
+
+    flex:1;
+
+    padding:16px;
+
+    border:none;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    background:#142740;
+
+    color:white;
+
+    font-size:16px;
+
+}
+
+.tab.active{
+
+    background:#2563eb;
+
+}
+/*=========================
+FORM
+=========================*/
+
+.signin-form h2{
+
+    font-size:32px;
+
+}
+
+.subtitle{
+
+    color:#b7c7df;
+
+    margin:12px 0 35px;
+
+}
+
+.input-group{
+
+    margin-bottom:25px;
+
+}
+
+.input-group label{
+
+    display:block;
+
+    margin-bottom:10px;
+
+    font-size:14px;
+
+}
+
+.input-group input{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#152842;
+
+    color:white;
+
+    outline:none;
+
+}
+
+.password-box{
+
+    position:relative;
+
+}
+
+.password-box button{
+
+    position:absolute;
+
+    right:15px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    background:none;
+
+    border:none;
+
+    color:white;
+
+    cursor:pointer;
+
+}
+
+.options{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:30px;
+
+    font-size:14px;
+
+}
+
+.options a{
+
+    color:#42d9ff;
+
+    text-decoration:none;
+
+}
+
+.login-btn{
+
+    width:100%;
+
+    padding:16px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#2563eb;
+
+    color:white;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.login-btn:hover{
+
+transform:translateY(-2px);
+
+box-shadow:0 10px 30px rgba(37,99,235,.35);
+
+}
+
+.divider{
+
+    margin:30px 0;
+
+    text-align:center;
+
+    position:relative;
+
+}
+
+.divider::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    top:50%;
+
+    width:100%;
+
+    height:1px;
+
+    background:rgba(255,255,255,.1);
+
+}
+
+.divider span{
+
+    background:#0b1627;
+
+    padding:0 15px;
+
+    position:relative;
+
+}
+
+.google-btn{
+
+    width:100%;
+
+    padding:16px;
+
+    border-radius:12px;
+
+    border:1px solid rgba(255,255,255,.1);
+
+    background:#152842;
+
+    color:white;
+
+    cursor:pointer;
+
+}
+
+.google-btn i{
+
+    margin-right:10px;
+
+}
+
+.signup-text{
+
+    margin:30px 0;
+
+    text-align:center;
+
+    color:#b7c7df;
+
+}
+
+.signup-text a{
+
+    color:#42d9ff;
+
+    text-decoration:none;
+
+    font-weight:600;
+
+}
+
+.guest-btn{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:10px;
+
+    text-decoration:none;
+
+    color:#42d9ff;
+
+    font-weight:600;
+
+}
+/*=========================
+AUTH FORMS
+=========================*/
+
+.auth-form{
+
+    display:none;
+
+    animation:fade .4s;
+
+}
+
+.active-form{
+
+    display:block;
+
+}
+
+@keyframes fade{
+
+from{
+
+opacity:0;
+
+transform:translateY(15px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+}
+.input-group input:focus{
+
+    border:2px solid #42d9ff;
+
+    background:#1b3352;
+
+}
+
+.login-btn{
+
+    font-weight:600;
+
+    letter-spacing:.5px;
+
+}
+
+.google-btn:hover{
+
+    background:#24446d;
+
+}
