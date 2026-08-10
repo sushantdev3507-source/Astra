@@ -1,347 +1,890 @@
-// ===============================
-// ASTRA CROP SYSTEM
-// ===============================
+
 
 let isCropMode = false;
 let cropRect = null;
+let cropImage = null;
 
 
-// ===============================
-// GET BUTTONS
-// ===============================
 
-function getCropButtons() {
-    return {
-        cropTool: document.getElementById("cropTool"),
-        applyCrop: document.getElementById("applyCrop"),
-        cancelCrop: document.getElementById("cancelCrop")
-    };
+
+function isCropCanvasReady() {
+
+    return (
+        typeof canvas !== "undefined" &&
+        canvas &&
+        typeof canvas.getObjects === "function"
+    );
+
 }
 
 
-// ===============================
-// START CROP
-// ===============================
+
+
+function saveCropHistory() {
+
+    if (typeof saveHistory === "function") {
+        saveHistory();
+    }
+
+}
+
+
+
+
+function getCropButtons() {
+
+    return {
+
+        cropTool:
+            document.getElementById("cropTool"),
+
+        applyCrop:
+            document.getElementById("applyCrop"),
+
+        cancelCrop:
+            document.getElementById("cancelCrop")
+
+    };
+
+}
+
+
+
+
+function getCropImage() {
+
+    if (!isCropCanvasReady()) {
+        return null;
+    }
+
+
+    
+
+    const activeObject =
+        canvas.getActiveObject();
+
+
+    if (
+        activeObject &&
+        activeObject.type === "image"
+    ) {
+
+        return activeObject;
+
+    }
+
+
+    
+    const objects =
+        canvas.getObjects();
+
+
+    return (
+        objects.find(
+            obj => obj.type === "image"
+        ) || null
+    );
+
+}
+
+
+
+   
 
 function startCrop() {
 
-    if (isCropMode) return;
+    if (!isCropCanvasReady()) {
 
-    const imageObject = canvas.getObjects().find(function(obj) {
-        return obj.type === "image";
-    });
+        console.error(
+            "ASTRA: Canvas is not available."
+        );
 
-    if (!imageObject) {
-        console.log("Please insert an image first");
+        return;
+
+    }
+
+
+    if (isCropMode) {
         return;
     }
 
-    isCropMode = true;
 
-    if (cropRect) {
-        canvas.remove(cropRect);
-        cropRect = null;
+    
+
+    const imageObject =
+        getCropImage();
+
+
+    if (!imageObject) {
+
+        alert(
+            "Please insert or select an image first."
+        );
+
+        return;
+
     }
 
-    // Start crop box over the image
-    const imageBox = imageObject.getBoundingRect();
 
-    cropRect = new fabric.Rect({
+  
 
-        left: imageBox.left + imageBox.width * 0.15,
-        top: imageBox.top + imageBox.height * 0.15,
+    if (cropRect) {
 
-        width: imageBox.width * 0.7,
-        height: imageBox.height * 0.7,
+        canvas.remove(cropRect);
 
-        fill: "rgba(0,0,0,0.25)",
+        cropRect = null;
 
-        stroke: "#ffffff",
-        strokeWidth: 2,
+    }
 
-        cornerColor: "#2563eb",
-        cornerStrokeColor: "#ffffff",
-        cornerSize: 12,
 
-        transparentCorners: false,
+    
 
-        lockRotation: true,
-        hasRotatingPoint: false,
+    cropImage = imageObject;
 
-        selectable: true,
-        evented: true
-    });
+    isCropMode = true;
+
+
+    
+      
+
+    imageObject.setCoords();
+
+
+    const imageBox =
+        imageObject.getBoundingRect();
+
+
+    if (
+        imageBox.width <= 0 ||
+        imageBox.height <= 0
+    ) {
+
+        isCropMode = false;
+        cropImage = null;
+
+        return;
+
+    }
+
+
+    
+
+    const cropWidth =
+        imageBox.width * 0.70;
+
+    const cropHeight =
+        imageBox.height * 0.70;
+
+
+    const cropLeft =
+        imageBox.left +
+        (imageBox.width - cropWidth) / 2;
+
+
+    const cropTop =
+        imageBox.top +
+        (imageBox.height - cropHeight) / 2;
+
+
+    
+    if (
+        typeof fabric === "undefined" ||
+        !fabric.Rect
+    ) {
+
+        console.error(
+            "ASTRA: Fabric.Rect is not available."
+        );
+
+        isCropMode = false;
+        cropImage = null;
+
+        return;
+
+    }
+
+
+    cropRect =
+        new fabric.Rect({
+
+            left: cropLeft,
+            top: cropTop,
+
+            width: cropWidth,
+            height: cropHeight,
+
+            fill: "rgba(0, 0, 0, 0.25)",
+
+            stroke: "#ffffff",
+            strokeWidth: 2,
+
+            cornerColor: "#2563eb",
+            cornerStrokeColor: "#ffffff",
+
+            cornerSize: 12,
+
+            transparentCorners: false,
+
+            lockRotation: true,
+
+            hasRotatingPoint: false,
+
+            selectable: true,
+            evented: true,
+
+            objectCaching: false
+
+        });
+
+
+    
 
     canvas.add(cropRect);
 
     canvas.setActiveObject(cropRect);
 
-    canvas.renderAll();
+    cropRect.setCoords();
 
-    console.log("CROP STARTED");
+    canvas.requestRenderAll();
+
+
+    console.log(
+        "ASTRA: Crop mode started."
+    );
+
 }
 
 
-// ===============================
-// KEEP CROP BOX INSIDE IMAGE
-// ===============================
+
 
 function keepCropInsideImage() {
 
-    if (!cropRect) return;
+    if (
+        !isCropMode ||
+        !cropRect ||
+        !cropImage
+    ) {
 
-    const imageObject = canvas.getObjects().find(function(obj) {
-        return obj.type === "image";
-    });
+        return;
 
-    if (!imageObject) return;
+    }
+
 
     cropRect.setCoords();
 
-    const cropBox = cropRect.getBoundingRect();
-    const imageBox = imageObject.getBoundingRect();
+    cropImage.setCoords();
 
-    let newLeft = cropRect.left;
-    let newTop = cropRect.top;
 
-    if (cropBox.left < imageBox.left) {
-        newLeft += imageBox.left - cropBox.left;
-    }
+    const cropBox =
+        cropRect.getBoundingRect();
 
-    if (cropBox.top < imageBox.top) {
-        newTop += imageBox.top - cropBox.top;
-    }
+
+    const imageBox =
+        cropImage.getBoundingRect();
+
+
+    let newLeft =
+        cropRect.left;
+
+    let newTop =
+        cropRect.top;
+
+
+    
 
     if (
-        cropBox.left + cropBox.width >
-        imageBox.left + imageBox.width
+        cropBox.left <
+        imageBox.left
     ) {
+
+        newLeft +=
+            imageBox.left -
+            cropBox.left;
+
+    }
+
+
+   
+
+    if (
+        cropBox.top <
+        imageBox.top
+    ) {
+
+        newTop +=
+            imageBox.top -
+            cropBox.top;
+
+    }
+
+
+   
+
+    if (
+        cropBox.left +
+        cropBox.width >
+        imageBox.left +
+        imageBox.width
+    ) {
+
         newLeft -=
-            (cropBox.left + cropBox.width) -
-            (imageBox.left + imageBox.width);
+            (
+                cropBox.left +
+                cropBox.width
+            ) -
+            (
+                imageBox.left +
+                imageBox.width
+            );
+
     }
 
+
+    
+
     if (
-        cropBox.top + cropBox.height >
-        imageBox.top + imageBox.height
+        cropBox.top +
+        cropBox.height >
+        imageBox.top +
+        imageBox.height
     ) {
+
         newTop -=
-            (cropBox.top + cropBox.height) -
-            (imageBox.top + imageBox.height);
+            (
+                cropBox.top +
+                cropBox.height
+            ) -
+            (
+                imageBox.top +
+                imageBox.height
+            );
+
     }
+
 
     cropRect.set({
+
         left: newLeft,
         top: newTop
+
     });
 
+
     cropRect.setCoords();
+
 }
 
 
-// ===============================
-// CROP BOX MOVING
-// ===============================
 
-canvas.on("object:moving", function(event) {
+if (isCropCanvasReady()) {
 
-    if (!isCropMode) return;
+    canvas.on(
+        "object:moving",
+        function (event) {
 
-    if (event.target !== cropRect) return;
-
-    keepCropInsideImage();
-
-});
+            if (!isCropMode) {
+                return;
+            }
 
 
-// ===============================
-// CROP BOX RESIZING
-// ===============================
-
-canvas.on("object:scaling", function(event) {
-
-    if (!isCropMode) return;
-
-    if (event.target !== cropRect) return;
-
-    keepCropInsideImage();
-
-});
+            if (
+                event.target !== cropRect
+            ) {
+                return;
+            }
 
 
-// ===============================
-// CANCEL CROP
-// ===============================
+            keepCropInsideImage();
 
-function cancelCropOperation() {
+        }
+    );
 
-    if (cropRect) {
+
+    
+
+    canvas.on(
+        "object:scaling",
+        function (event) {
+
+            if (!isCropMode) {
+                return;
+            }
+
+
+            if (
+                event.target !== cropRect
+            ) {
+                return;
+            }
+
+
+            keepCropInsideImage();
+
+        }
+    );
+
+}
+
+
+
+
+function removeCropBox() {
+
+    if (
+        cropRect &&
+        isCropCanvasReady()
+    ) {
 
         canvas.remove(cropRect);
 
-        cropRect = null;
     }
 
-    isCropMode = false;
 
-    canvas.discardActiveObject();
+    cropRect = null;
 
-    canvas.renderAll();
-
-    console.log("CROP CANCELLED");
 }
 
 
-// ===============================
-// APPLY CROP
-// ===============================
+
+
+function cancelCropOperation() {
+
+    if (!isCropMode) {
+        return;
+    }
+
+
+    
+    removeCropBox();
+
+
+    
+    isCropMode = false;
+
+    cropImage = null;
+
+
+    
+    if (isCropCanvasReady()) {
+
+        canvas.discardActiveObject();
+
+        canvas.requestRenderAll();
+
+    }
+
+
+    console.log(
+        "ASTRA: Crop cancelled."
+    );
+
+}
+
+
 
 function applyCropOperation() {
 
-    if (!isCropMode || !cropRect) {
+    if (
+        !isCropMode ||
+        !cropRect
+    ) {
 
-        console.log("Crop mode is not active");
+        console.log(
+            "ASTRA: Crop mode is not active."
+        );
 
+        return;
+
+    }
+
+
+    if (!isCropCanvasReady()) {
         return;
     }
 
-    const imageObject = canvas.getObjects().find(function(obj) {
-        return obj.type === "image";
-    });
+
+    const imageObject =
+        cropImage || getCropImage();
+
 
     if (!imageObject) {
 
-        console.log("No image found");
+        alert(
+            "No image is available for cropping."
+        );
 
         return;
+
     }
 
+
+    
     cropRect.setCoords();
 
-    const cropBox = cropRect.getBoundingRect();
-    const imageBox = imageObject.getBoundingRect();
+    imageObject.setCoords();
 
-    // Exact selected area relative to image
-    const relativeLeft =
-        cropBox.left - imageBox.left;
 
-    const relativeTop =
-        cropBox.top - imageBox.top;
+    const cropBox =
+        cropRect.getBoundingRect();
+
+
+    const imageBox =
+        imageObject.getBoundingRect();
+
+
+    
+
+    if (
+        cropBox.width <= 0 ||
+        cropBox.height <= 0
+    ) {
+
+        alert(
+            "Invalid crop area."
+        );
+
+        return;
+
+    }
+
+
+    
 
     const scaleX =
-        imageObject.width / imageBox.width;
+        imageObject.width /
+        imageBox.width;
+
 
     const scaleY =
-        imageObject.height / imageBox.height;
+        imageObject.height /
+        imageBox.height;
+
+
+    if (
+        !Number.isFinite(scaleX) ||
+        !Number.isFinite(scaleY) ||
+        scaleX <= 0 ||
+        scaleY <= 0
+    ) {
+
+        alert(
+            "Unable to calculate crop area."
+        );
+
+        return;
+
+    }
+
+
+    
+       
+
+    const relativeLeft =
+        Math.max(
+            0,
+            cropBox.left -
+            imageBox.left
+        );
+
+
+    const relativeTop =
+        Math.max(
+            0,
+            cropBox.top -
+            imageBox.top
+        );
+
+
+    
 
     const sourceX =
-        relativeLeft * scaleX;
+        relativeLeft *
+        scaleX;
+
 
     const sourceY =
-        relativeTop * scaleY;
+        relativeTop *
+        scaleY;
+
 
     const sourceWidth =
-        cropBox.width * scaleX;
+        cropBox.width *
+        scaleX;
+
 
     const sourceHeight =
-        cropBox.height * scaleY;
+        cropBox.height *
+        scaleY;
 
-    // Temporary canvas
+
+    
+    const safeSourceX =
+        Math.max(
+            0,
+            Math.min(
+                sourceX,
+                imageObject.width
+            )
+        );
+
+
+    const safeSourceY =
+        Math.max(
+            0,
+            Math.min(
+                sourceY,
+                imageObject.height
+            )
+        );
+
+
+    const safeSourceWidth =
+        Math.min(
+            sourceWidth,
+            imageObject.width -
+            safeSourceX
+        );
+
+
+    const safeSourceHeight =
+        Math.min(
+            sourceHeight,
+            imageObject.height -
+            safeSourceY
+        );
+
+
+    if (
+        safeSourceWidth <= 0 ||
+        safeSourceHeight <= 0
+    ) {
+
+        alert(
+            "Invalid crop selection."
+        );
+
+        return;
+
+    }
+
+
+    
+
     const tempCanvas =
         document.createElement("canvas");
 
+
     tempCanvas.width =
-        Math.round(sourceWidth);
+        Math.max(
+            1,
+            Math.round(safeSourceWidth)
+        );
+
 
     tempCanvas.height =
-        Math.round(sourceHeight);
+        Math.max(
+            1,
+            Math.round(safeSourceHeight)
+        );
+
 
     const ctx =
         tempCanvas.getContext("2d");
 
-    // Draw EXACT selected area
-    ctx.drawImage(
 
-        imageObject.getElement(),
+    if (!ctx) {
 
-        sourceX,
-        sourceY,
+        alert(
+            "Unable to create crop canvas."
+        );
 
-        sourceWidth,
-        sourceHeight,
+        return;
 
-        0,
-        0,
+    }
 
-        tempCanvas.width,
-        tempCanvas.height
-    );
 
-    // Create cropped image
+    
+
+    try {
+
+        ctx.drawImage(
+
+            imageObject.getElement(),
+
+            safeSourceX,
+            safeSourceY,
+
+            safeSourceWidth,
+            safeSourceHeight,
+
+            0,
+            0,
+
+            tempCanvas.width,
+            tempCanvas.height
+
+        );
+
+    } catch (error) {
+
+        console.error(
+            "ASTRA: Crop drawing failed.",
+            error
+        );
+
+        alert(
+            "Unable to crop the image."
+        );
+
+        return;
+
+    }
+
+
+    
+
+    const croppedData =
+        tempCanvas.toDataURL(
+            "image/png"
+        );
+
+
     fabric.Image.fromURL(
+        croppedData,
+        function (newImage) {
 
-        tempCanvas.toDataURL("image/png"),
+            if (!newImage) {
 
-        function(newImage) {
+                alert(
+                    "Unable to create cropped image."
+                );
+
+                return;
+
+            }
+
+
+            
+
+            const cropCenterX =
+                cropBox.left +
+                cropBox.width / 2;
+
+
+            const cropCenterY =
+                cropBox.top +
+                cropBox.height / 2;
+
+
+            
+
+            const newScaleX =
+                cropBox.width /
+                newImage.width;
+
+
+            const newScaleY =
+                cropBox.height /
+                newImage.height;
+
 
             newImage.set({
 
-                left:
-                    cropBox.left +
-                    cropBox.width / 2,
-
-                top:
-                    cropBox.top +
-                    cropBox.height / 2,
+                left: cropCenterX,
+                top: cropCenterY,
 
                 originX: "center",
-                originY: "center"
+                originY: "center",
+
+                scaleX: newScaleX,
+                scaleY: newScaleY,
+
+                angle:
+                    imageObject.angle || 0,
+
+                flipX:
+                    imageObject.flipX || false,
+
+                flipY:
+                    imageObject.flipY || false,
+
+                opacity:
+                    imageObject.opacity ?? 1,
+
+                selectable: true,
+                evented: true,
+
+                hasControls: true,
+                hasBorders: true
 
             });
 
-            // Keep same displayed crop size
-            // Make cropped image easier to see
-const targetWidth = 500;
 
-const scale = targetWidth / newImage.width;
+           
 
-newImage.scaleX = scale;
-newImage.scaleY = scale;
-
-            // Remove original image
             canvas.remove(imageObject);
 
-            // Remove crop box
-            canvas.remove(cropRect);
 
-            cropRect = null;
+            
+
+            removeCropBox();
+
+
+            
 
             isCropMode = false;
 
-            // Add cropped image
+            cropImage = null;
+
+
+            
             canvas.add(newImage);
 
             canvas.setActiveObject(newImage);
 
-            canvas.renderAll();
+            newImage.setCoords();
+
+            canvas.requestRenderAll();
+
+
+            
+
+            saveCropHistory();
+
 
             console.log(
-                "IMAGE CROPPED SUCCESSFULLY"
+                "ASTRA: Image cropped successfully."
             );
+
         }
     );
+
 }
 
 
-// ===============================
-// BUTTON EVENTS
-// ===============================
+
+
+let cropButtonsInitialized = false;
+
 
 function setupCropButtons() {
 
-    const buttons = getCropButtons();
+    if (cropButtonsInitialized) {
+        return;
+    }
 
-    console.log("Crop buttons:", buttons);
+
+    const buttons =
+        getCropButtons();
+
+
+    console.log(
+        "ASTRA: Crop buttons initialized.",
+        buttons
+    );
+
+
+    
 
     if (buttons.cropTool) {
 
@@ -352,6 +895,9 @@ function setupCropButtons() {
 
     }
 
+
+    
+
     if (buttons.applyCrop) {
 
         buttons.applyCrop.addEventListener(
@@ -361,6 +907,9 @@ function setupCropButtons() {
 
     }
 
+
+    
+
     if (buttons.cancelCrop) {
 
         buttons.cancelCrop.addEventListener(
@@ -369,18 +918,24 @@ function setupCropButtons() {
         );
 
     }
+
+
+    cropButtonsInitialized = true;
+
 }
 
 
-// ===============================
-// WAIT FOR PAGE
-// ===============================
 
-if (document.readyState === "loading") {
+
+if (
+    document.readyState ===
+    "loading"
+) {
 
     document.addEventListener(
         "DOMContentLoaded",
-        setupCropButtons
+        setupCropButtons,
+        { once: true }
     );
 
 } else {
@@ -388,3 +943,10 @@ if (document.readyState === "loading") {
     setupCropButtons();
 
 }
+
+
+
+   
+console.log(
+    "ASTRA: Crop System Loaded Successfully."
+);

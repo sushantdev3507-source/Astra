@@ -1,142 +1,530 @@
-
-
 let copiedObject = null;
+
+
+function isKeyboardCanvasReady() {
+
+    return (
+        typeof canvas !== "undefined" &&
+        canvas &&
+        typeof canvas.getActiveObject ===
+            "function"
+    );
+
+}
+
+
+
+function isTypingTarget(element) {
+
+    if (!element) {
+        return false;
+    }
+
+    const tagName =
+        element.tagName
+            ? element.tagName.toLowerCase()
+            : "";
+
+    if (
+        tagName === "input" ||
+        tagName === "textarea" ||
+        tagName === "select"
+    ) {
+        return true;
+    }
+
+    if (
+        element.isContentEditable
+    ) {
+        return true;
+    }
+
+    if (
+        isKeyboardCanvasReady() &&
+        typeof canvas.getActiveObject ===
+            "function"
+    ) {
+
+        const active =
+            canvas.getActiveObject();
+
+        if (
+            active &&
+            active.isEditing
+        ) {
+            return true;
+        }
+
+    }
+
+    return false;
+
+}
+
+
 function copyObject() {
 
-    const active = canvas.getActiveObject();
+    if (
+        !isKeyboardCanvasReady()
+    ) {
+        return;
+    }
 
-    if (!active) return;
+    const active =
+        canvas.getActiveObject();
 
-    active.clone(function(cloned) {
+    if (!active) {
+        return;
+    }
 
-        copiedObject = cloned;
+    active.clone(
+        function (cloned) {
 
-    });
+            copiedObject =
+                cloned;
+
+        }
+    );
 
 }
+
+
 function pasteObject() {
 
-    if (!copiedObject) return;
+    if (
+        !isKeyboardCanvasReady() ||
+        !copiedObject
+    ) {
+        return;
+    }
 
-    copiedObject.clone(function(clone) {
+    copiedObject.clone(
 
-        clone.set({
+        function (clone) {
 
-            left: clone.left + 20,
+            const left =
+                Number(
+                    clone.left
+                ) || 0;
 
-            top: clone.top + 20
+            const top =
+                Number(
+                    clone.top
+                ) || 0;
 
-        });
+            clone.set({
 
-        canvas.add(clone);
+                left:
+                    left + 20,
 
-        canvas.setActiveObject(clone);
+                top:
+                    top + 20,
 
-        canvas.renderAll();
+                evented: true,
 
-    });
+                selectable: true
+
+            });
+
+            canvas.add(
+                clone
+            );
+
+            canvas.setActiveObject(
+                clone
+            );
+
+            canvas.requestRenderAll();
+
+            if (
+                typeof saveHistory ===
+                "function"
+            ) {
+                saveHistory();
+            }
+
+            if (
+                typeof autoSaveProject ===
+                "function"
+            ) {
+                autoSaveProject();
+            }
+
+        }
+    );
 
 }
+
+
 function deleteObject() {
 
-    const active = canvas.getActiveObject();
+    if (
+        !isKeyboardCanvasReady()
+    ) {
+        return;
+    }
 
-    if (!active) return;
+    const active =
+        canvas.getActiveObject();
 
-    canvas.remove(active);
+    if (!active) {
+        return;
+    }
 
-    canvas.renderAll();
+    if (
+        active.type ===
+        "activeSelection"
+    ) {
+
+        const objects =
+            active.getObjects();
+
+        canvas.discardActiveObject();
+
+        objects.forEach(
+            function (object) {
+
+                canvas.remove(
+                    object
+                );
+
+            }
+        );
+
+    } else {
+
+        canvas.remove(
+            active
+        );
+
+    }
+
+    canvas.discardActiveObject();
+
+    canvas.requestRenderAll();
+
+    if (
+        typeof saveHistory ===
+        "function"
+    ) {
+        saveHistory();
+    }
+
+    if (
+        typeof autoSaveProject ===
+        "function"
+    ) {
+        autoSaveProject();
+    }
 
 }
+
+
 function duplicateObject() {
 
-    const active = canvas.getActiveObject();
+    if (
+        !isKeyboardCanvasReady()
+    ) {
+        return;
+    }
 
-    if (!active) return;
+    const active =
+        canvas.getActiveObject();
 
-    active.clone(function(clone) {
+    if (!active) {
+        return;
+    }
 
-        clone.set({
+    active.clone(
 
-            left: clone.left + 25,
+        function (clone) {
 
-            top: clone.top + 25
+            const left =
+                Number(
+                    clone.left
+                ) || 0;
 
-        });
+            const top =
+                Number(
+                    clone.top
+                ) || 0;
 
-        canvas.add(clone);
+            clone.set({
 
-        canvas.setActiveObject(clone);
+                left:
+                    left + 25,
 
-        canvas.renderAll();
+                top:
+                    top + 25,
 
-    });
+                evented: true,
+
+                selectable: true
+
+            });
+
+            canvas.add(
+                clone
+            );
+
+            canvas.setActiveObject(
+                clone
+            );
+
+            canvas.requestRenderAll();
+
+            if (
+                typeof saveHistory ===
+                "function"
+            ) {
+                saveHistory();
+            }
+
+            if (
+                typeof autoSaveProject ===
+                "function"
+            ) {
+                autoSaveProject();
+            }
+
+        }
+    );
 
 }
+
+
+
 function selectAllObjects() {
 
-    const selection = new fabric.ActiveSelection(
+    if (
+        !isKeyboardCanvasReady()
+    ) {
+        return;
+    }
 
-        canvas.getObjects(),
+    const objects =
+        canvas.getObjects();
 
-        {
+    if (
+        !objects ||
+        objects.length === 0
+    ) {
+        return;
+    }
 
-            canvas: canvas
+    const selectableObjects =
+        objects.filter(
+            function (object) {
+
+                return (
+                    object.selectable !== false &&
+                    object.evented !== false
+                );
+
+            }
+        );
+
+    if (
+        selectableObjects.length === 0
+    ) {
+        return;
+    }
+
+    if (
+        selectableObjects.length === 1
+    ) {
+
+        canvas.setActiveObject(
+            selectableObjects[0]
+        );
+
+    } else {
+
+        const selection =
+            new fabric.ActiveSelection(
+
+                selectableObjects,
+
+                {
+                    canvas: canvas
+                }
+
+            );
+
+        canvas.setActiveObject(
+            selection
+        );
+
+    }
+
+    canvas.requestRenderAll();
+
+}
+
+
+
+function escapeSelection() {
+
+    if (
+        !isKeyboardCanvasReady()
+    ) {
+        return;
+    }
+
+    const active =
+        canvas.getActiveObject();
+
+    if (
+        active &&
+        active.isEditing
+    ) {
+
+        active.exitEditing();
+
+        canvas.requestRenderAll();
+
+        return;
+
+    }
+
+    canvas.discardActiveObject();
+
+    canvas.requestRenderAll();
+
+}
+
+
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (
+            isTypingTarget(
+                event.target
+            )
+        ) {
+
+            if (
+                event.key !==
+                "Escape"
+            ) {
+                return;
+            }
 
         }
 
-    );
+        if (
+            event.key ===
+            "Delete"
+        ) {
 
-    canvas.setActiveObject(selection);
+            event.preventDefault();
 
-    canvas.renderAll();
+            deleteObject();
 
-}
-document.addEventListener("keydown", function(e){
+            return;
 
-    // Delete
-    if(e.key==="Delete"){
+        }
 
-        e.preventDefault();
+        if (
+            event.ctrlKey &&
+            !event.shiftKey &&
+            !event.altKey &&
+            event.key.toLowerCase() ===
+                "c"
+        ) {
 
-        deleteObject();
+            event.preventDefault();
+
+            copyObject();
+
+            return;
+
+        }
+
+        if (
+            event.ctrlKey &&
+            !event.shiftKey &&
+            !event.altKey &&
+            event.key.toLowerCase() ===
+                "v"
+        ) {
+
+            event.preventDefault();
+
+            pasteObject();
+
+            return;
+
+        }
+
+        if (
+            event.ctrlKey &&
+            !event.shiftKey &&
+            !event.altKey &&
+            event.key.toLowerCase() ===
+                "d"
+        ) {
+
+            event.preventDefault();
+
+            duplicateObject();
+
+            return;
+
+        }
+
+        if (
+            event.ctrlKey &&
+            !event.shiftKey &&
+            !event.altKey &&
+            event.key.toLowerCase() ===
+                "a"
+        ) {
+
+            event.preventDefault();
+
+            selectAllObjects();
+
+            return;
+
+        }
+
+        if (
+            event.key ===
+            "Escape"
+        ) {
+
+            event.preventDefault();
+
+            escapeSelection();
+
+        }
 
     }
+);
 
-    // Ctrl+C
-    if(e.ctrlKey && e.key==="c"){
 
-        e.preventDefault();
 
-        copyObject();
+window.copyObject =
+    copyObject;
 
-    }
+window.pasteObject =
+    pasteObject;
 
-    // Ctrl+V
-    if(e.ctrlKey && e.key==="v"){
+window.deleteObject =
+    deleteObject;
 
-        e.preventDefault();
+window.duplicateObject =
+    duplicateObject;
 
-        pasteObject();
+window.selectAllObjects =
+    selectAllObjects;
 
-    }
+window.escapeSelection =
+    escapeSelection;
 
-    // Ctrl+D
-    if(e.ctrlKey && e.key==="d"){
-
-        e.preventDefault();
-
-        duplicateObject();
-
-    }
-
-    // Ctrl+A
-    if(e.ctrlKey && e.key==="a"){
-
-        e.preventDefault();
-
-        selectAllObjects();
-
-    }
-
-});
+console.log(
+    "ASTRA: Keyboard Shortcuts Loaded Successfully."
+);

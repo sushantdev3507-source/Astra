@@ -2,859 +2,1215 @@ let cropRect = null;
 let cropMode = false;
 
 
-const canvas = new fabric.Canvas("editorCanvas",{
 
-width:1000,
+const uploadBtn =
+document.getElementById("uploadImage");
 
-height:650,
+const imageInput =
+document.getElementById("imageInput");
 
-backgroundColor:"#ffffff",
+const addHeadingBtn =
+document.getElementById("addHeading");
 
-preserveObjectStacking:true
+const addParagraphBtn =
+document.getElementById("addParagraph");
 
-});
+const fontFamilyControl =
+document.getElementById("fontFamily");
 
+const fontSizeControl =
+document.getElementById("fontSize");
 
+const fontColorControl =
+document.getElementById("fontColor");
 
-const uploadBtn=document.getElementById("uploadImage");
+const fillColorControl =
+document.getElementById("fillColor");
 
-const imageInput=document.getElementById("imageInput");
+const strokeColorControl =
+document.getElementById("strokeColor");
 
-uploadBtn.onclick=()=>{
+const strokeWidthControl =
+document.getElementById("strokeWidth");
 
-imageInput.click();
+const opacityControl =
+document.getElementById("opacity");
 
-};
+const rotationControl =
+document.getElementById("rotation");
 
-imageInput.onchange=(e)=>{
 
-const file=e.target.files[0];
 
-if(!file)return;
+if (uploadBtn && imageInput) {
 
-const reader=new FileReader();
+    uploadBtn.addEventListener(
+        "click",
+        function () {
 
-reader.onload=(event)=>{
+            imageInput.click();
 
-fabric.Image.fromURL(event.target.result,(img)=>{
+        }
+    );
 
-img.scaleToWidth(500);
 
-canvas.add(img);
+    imageInput.addEventListener(
+        "change",
+        function (event) {
 
-canvas.centerObject(img);
+            const file =
+                event.target.files[0];
 
-canvas.setActiveObject(img);
 
-canvas.renderAll();
+            if (!file) {
+                return;
+            }
 
-});
 
-};
+            if (!file.type.startsWith("image/")) {
 
-reader.readAsDataURL(file);
+                alert(
+                    "Please select a valid image file."
+                );
 
-};
+                return;
 
+            }
 
-document.getElementById("addHeading").onclick = () => {
 
-    const text = new fabric.IText("Heading", {
+            const reader =
+                new FileReader();
 
-        left: 250,
 
-        top: 150,
+            reader.onload =
+                function (e) {
 
-        fontSize: 48,
+                    fabric.Image.fromURL(
+                        e.target.result,
+                        function (img) {
 
-        fontFamily: "Poppins",
+                            if (
+                                img.width &&
+                                img.width > 500
+                            ) {
 
-        fill: "#000000",
+                                img.scaleToWidth(500);
 
-        fontWeight: "bold"
+                            }
 
-    });
 
-    canvas.add(text);
+                            canvas.add(img);
 
-    canvas.setActiveObject(text);
+                            canvas.centerObject(img);
 
-};
+                            canvas.setActiveObject(img);
 
+                            canvas.requestRenderAll();
 
+                        }
+                    );
 
-document.getElementById("addParagraph").onclick = () => {
+                };
 
-    const text = new fabric.IText("Start typing...", {
 
-        left: 250,
+            reader.readAsDataURL(file);
 
-        top: 250,
+            imageInput.value = "";
 
-        width:400,
-
-        fontSize:24,
-
-        fontFamily:"Poppins",
-
-        fill:"#000000"
-
-    });
-
-    canvas.add(text);
-
-    canvas.setActiveObject(text);
-
-};
-const fontFamily = document.getElementById("fontFamily");
-const fontSize = document.getElementById("fontSize");
-const fontColor = document.getElementById("fontColor");
-
-fontFamily.onchange = () => {
-
-    const obj = canvas.getActiveObject();
-
-    if(!obj) return;
-
-    obj.set("fontFamily",fontFamily.value);
-
-    canvas.renderAll();
-
-};
-
-fontSize.oninput = () => {
-
-    const obj = canvas.getActiveObject();
-
-    if(!obj) return;
-
-    obj.set("fontSize",Number(fontSize.value));
-
-    canvas.renderAll();
-
-};
-
-fontColor.oninput = () => {
-
-    const obj = canvas.getActiveObject();
-
-    if(!obj) return;
-
-    obj.set("fill",fontColor.value);
-
-    canvas.renderAll();
-
-};
-document.getElementById("boldBtn").onclick=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj)return;
-
-obj.set("fontWeight",
-
-obj.fontWeight==="bold"
-
-?"normal"
-
-:"bold");
-
-canvas.renderAll();
-
-};
-
-document.getElementById("italicBtn").onclick=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj)return;
-
-obj.set("fontStyle",
-
-obj.fontStyle==="italic"
-
-?"normal"
-
-:"italic");
-
-canvas.renderAll();
-
-};
-
-document.getElementById("underlineBtn").onclick=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj)return;
-
-obj.set("underline",
-
-!obj.underline);
-
-canvas.renderAll();
-
-};
-document.getElementById("addRectangle").onclick=()=>{
-
-const rect=new fabric.Rect({
-
-left:200,
-
-top:150,
-
-width:220,
-
-height:140,
-
-fill:"#4f46e5",
-
-stroke:"#000",
-
-strokeWidth:2,
-
-rx:12,
-
-ry:12
-
-});
-
-canvas.add(rect);
-
-canvas.setActiveObject(rect);
-
-};
-document.getElementById("addCircle").onclick=()=>{
-
-const circle=new fabric.Circle({
-
-left:250,
-
-top:220,
-
-radius:70,
-
-fill:"#06b6d4",
-
-stroke:"#000",
-
-strokeWidth:2
-
-});
-
-canvas.add(circle);
-
-canvas.setActiveObject(circle);
-
-};
-document.getElementById("addTriangle").onclick=()=>{
-
-const triangle=new fabric.Triangle({
-
-left:320,
-
-top:180,
-
-width:120,
-
-height:120,
-
-fill:"#f97316",
-
-stroke:"#000",
-
-strokeWidth:2
-
-});
-
-canvas.add(triangle);
-
-canvas.setActiveObject(triangle);
-
-};
-document.getElementById("addLine").onclick=()=>{
-
-const line=new fabric.Line(
-
-[50,50,250,50],
-
-{
-
-stroke:"#000",
-
-strokeWidth:4
+        }
+    );
 
 }
 
+
+
+if (addHeadingBtn) {
+
+    addHeadingBtn.addEventListener(
+        "click",
+        function () {
+
+            const text =
+                new fabric.IText(
+                    "Heading",
+                    {
+
+                        left: 250,
+
+                        top: 150,
+
+                        fontSize: 48,
+
+                        fontFamily: "Poppins",
+
+                        fill: "#000000",
+
+                        fontWeight: "bold"
+
+                    }
+                );
+
+
+            canvas.add(text);
+
+            canvas.setActiveObject(text);
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+
+
+if (addParagraphBtn) {
+
+    addParagraphBtn.addEventListener(
+        "click",
+        function () {
+
+            const text =
+                new fabric.IText(
+                    "Start typing...",
+                    {
+
+                        left: 250,
+
+                        top: 250,
+
+                        fontSize: 24,
+
+                        fontFamily: "Poppins",
+
+                        fill: "#000000"
+
+                    }
+                );
+
+
+            canvas.add(text);
+
+            canvas.setActiveObject(text);
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+
+if (fontFamilyControl) {
+
+    fontFamilyControl.addEventListener(
+        "change",
+        function () {
+
+            const obj =
+                canvas.getActiveObject();
+
+
+            if (!obj) {
+                return;
+            }
+
+
+            if (
+                obj.type === "i-text" ||
+                obj.type === "text" ||
+                obj.type === "textbox"
+            ) {
+
+                obj.set(
+                    "fontFamily",
+                    fontFamilyControl.value
+                );
+
+                canvas.requestRenderAll();
+
+            }
+
+        }
+    );
+
+}
+
+
+
+if (fontSizeControl) {
+
+    fontSizeControl.addEventListener(
+        "input",
+        function () {
+
+            const obj =
+                canvas.getActiveObject();
+
+
+            if (!obj) {
+                return;
+            }
+
+
+            if (
+                obj.type === "i-text" ||
+                obj.type === "text" ||
+                obj.type === "textbox"
+            ) {
+
+                obj.set(
+                    "fontSize",
+                    Number(fontSizeControl.value)
+                );
+
+                canvas.requestRenderAll();
+
+            }
+
+        }
+    );
+
+}
+
+
+
+if (fontColorControl) {
+
+    fontColorControl.addEventListener(
+        "input",
+        function () {
+
+            const obj =
+                canvas.getActiveObject();
+
+
+            if (!obj) {
+                return;
+            }
+
+
+            if (
+                obj.type === "i-text" ||
+                obj.type === "text" ||
+                obj.type === "textbox"
+            ) {
+
+                obj.set(
+                    "fill",
+                    fontColorControl.value
+                );
+
+                canvas.requestRenderAll();
+
+            }
+
+        }
+    );
+
+}
+
+
+
+const boldBtn =
+document.getElementById("boldBtn");
+
+if (boldBtn) {
+
+    boldBtn.addEventListener(
+        "click",
+        function () {
+
+            const obj =
+                canvas.getActiveObject();
+
+
+            if (!obj) {
+                return;
+            }
+
+
+            if (
+                obj.type !== "i-text" &&
+                obj.type !== "text" &&
+                obj.type !== "textbox"
+            ) {
+
+                return;
+
+            }
+
+
+            obj.set(
+                "fontWeight",
+                obj.fontWeight === "bold"
+                    ? "normal"
+                    : "bold"
+            );
+
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+
+
+const italicBtn =
+document.getElementById("italicBtn");
+
+if (italicBtn) {
+
+    italicBtn.addEventListener(
+        "click",
+        function () {
+
+            const obj =
+                canvas.getActiveObject();
+
+
+            if (!obj) {
+                return;
+            }
+
+
+            if (
+                obj.type !== "i-text" &&
+                obj.type !== "text" &&
+                obj.type !== "textbox"
+            ) {
+
+                return;
+
+            }
+
+
+            obj.set(
+                "fontStyle",
+                obj.fontStyle === "italic"
+                    ? "normal"
+                    : "italic"
+            );
+
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+
+
+const underlineBtn =
+document.getElementById("underlineBtn");
+
+if (underlineBtn) {
+
+    underlineBtn.addEventListener(
+        "click",
+        function () {
+
+            const obj =
+                canvas.getActiveObject();
+
+
+            if (!obj) {
+                return;
+            }
+
+
+            if (
+                obj.type !== "i-text" &&
+                obj.type !== "text" &&
+                obj.type !== "textbox"
+            ) {
+
+                return;
+
+            }
+
+
+            obj.set(
+                "underline",
+                !obj.underline
+            );
+
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+
+
+const addRectangleBtn =
+document.getElementById("addRectangle");
+
+if (addRectangleBtn) {
+
+    addRectangleBtn.addEventListener(
+        "click",
+        function () {
+
+            const rect =
+                new fabric.Rect(
+                    {
+
+                        left: 200,
+
+                        top: 150,
+
+                        width: 220,
+
+                        height: 140,
+
+                        fill: "#4f46e5",
+
+                        stroke: "#000000",
+
+                        strokeWidth: 2,
+
+                        rx: 12,
+
+                        ry: 12
+
+                    }
+                );
+
+
+            canvas.add(rect);
+
+            canvas.setActiveObject(rect);
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+
+
+const addCircleBtn =
+document.getElementById("addCircle");
+
+if (addCircleBtn) {
+
+    addCircleBtn.addEventListener(
+        "click",
+        function () {
+
+            const circle =
+                new fabric.Circle(
+                    {
+
+                        left: 250,
+
+                        top: 220,
+
+                        radius: 70,
+
+                        fill: "#06b6d4",
+
+                        stroke: "#000000",
+
+                        strokeWidth: 2
+
+                    }
+                );
+
+
+            canvas.add(circle);
+
+            canvas.setActiveObject(circle);
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+
+
+const addTriangleBtn =
+document.getElementById("addTriangle");
+
+if (addTriangleBtn) {
+
+    addTriangleBtn.addEventListener(
+        "click",
+        function () {
+
+            const triangle =
+                new fabric.Triangle(
+                    {
+
+                        left: 320,
+
+                        top: 180,
+
+                        width: 120,
+
+                        height: 120,
+
+                        fill: "#f97316",
+
+                        stroke: "#000000",
+
+                        strokeWidth: 2
+
+                    }
+                );
+
+
+            canvas.add(triangle);
+
+            canvas.setActiveObject(triangle);
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+
+
+const addLineBtn =
+document.getElementById("addLine");
+
+if (addLineBtn) {
+
+    addLineBtn.addEventListener(
+        "click",
+        function () {
+
+            const line =
+                new fabric.Line(
+                    [
+                        50,
+                        50,
+                        250,
+                        50
+                    ],
+                    {
+
+                        stroke: "#000000",
+
+                        strokeWidth: 4
+
+                    }
+                );
+
+
+            canvas.add(line);
+
+            canvas.setActiveObject(line);
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+
+
+if (fillColorControl) {
+
+    fillColorControl.addEventListener(
+        "input",
+        function () {
+
+            const obj =
+                canvas.getActiveObject();
+
+
+            if (!obj) {
+                return;
+            }
+
+
+            obj.set(
+                "fill",
+                fillColorControl.value
+            );
+
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+
+
+if (strokeColorControl) {
+
+    strokeColorControl.addEventListener(
+        "input",
+        function () {
+
+            const obj =
+                canvas.getActiveObject();
+
+
+            if (!obj) {
+                return;
+            }
+
+
+            obj.set(
+                "stroke",
+                strokeColorControl.value
+            );
+
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+
+
+if (strokeWidthControl) {
+
+    strokeWidthControl.addEventListener(
+        "input",
+        function () {
+
+            const obj =
+                canvas.getActiveObject();
+
+
+            if (!obj) {
+                return;
+            }
+
+
+            obj.set(
+                "strokeWidth",
+                Number(strokeWidthControl.value)
+            );
+
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+
+
+if (opacityControl) {
+
+    opacityControl.addEventListener(
+        "input",
+        function () {
+
+            const obj =
+                canvas.getActiveObject();
+
+
+            if (!obj) {
+                return;
+            }
+
+
+            obj.set(
+                "opacity",
+                Number(opacityControl.value) / 100
+            );
+
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+
+
+if (rotationControl) {
+
+    rotationControl.addEventListener(
+        "input",
+        function () {
+
+            const obj =
+                canvas.getActiveObject();
+
+
+            if (!obj) {
+                return;
+            }
+
+
+            obj.rotate(
+                Number(rotationControl.value)
+            );
+
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+
+
+function deleteSelectedObject() {
+
+    const obj =
+        canvas.getActiveObject();
+
+
+    if (!obj) {
+        return;
+    }
+
+
+    canvas.remove(obj);
+
+    canvas.discardActiveObject();
+
+    canvas.requestRenderAll();
+
+}
+
+const deleteObjectBtn =
+document.getElementById("deleteObject");
+
+if (deleteObjectBtn) {
+
+    deleteObjectBtn.addEventListener(
+        "click",
+        deleteSelectedObject
+    );
+
+}
+
+const deleteBtn =
+document.getElementById("deleteBtn");
+
+if (deleteBtn) {
+
+    deleteBtn.addEventListener(
+        "click",
+        deleteSelectedObject
+    );
+
+}
+
+
+
+function duplicateSelectedObject() {
+
+    if (
+        typeof window.duplicateObject ===
+        "function"
+    ) {
+
+        window.duplicateObject();
+
+        return;
+
+    }
+
+
+    const obj =
+        canvas.getActiveObject();
+
+
+    if (!obj) {
+        return;
+    }
+
+
+    obj.clone(
+        function (clone) {
+
+            clone.set(
+                {
+
+                    left:
+                        (obj.left || 0) + 20,
+
+                    top:
+                        (obj.top || 0) + 20
+
+                }
+            );
+
+
+            if (obj.layerName) {
+
+                clone.layerName =
+                    obj.layerName + " Copy";
+
+            }
+
+
+            canvas.add(clone);
+
+            canvas.setActiveObject(clone);
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+const duplicateBtn =
+document.getElementById("duplicateBtn");
+
+if (duplicateBtn) {
+
+    duplicateBtn.addEventListener(
+        "click",
+        duplicateSelectedObject
+    );
+
+}
+
+
+
+function syncProperties() {
+
+    const obj =
+        canvas.getActiveObject();
+
+
+    if (!obj) {
+        return;
+    }
+
+
+    if (fillColorControl) {
+
+        if (
+            typeof obj.fill === "string"
+        ) {
+
+            fillColorControl.value =
+                obj.fill;
+
+        }
+
+    }
+
+
+    if (strokeColorControl) {
+
+        if (
+            typeof obj.stroke === "string"
+        ) {
+
+            strokeColorControl.value =
+                obj.stroke;
+
+        }
+
+    }
+
+
+    if (strokeWidthControl) {
+
+        strokeWidthControl.value =
+            obj.strokeWidth != null
+                ? obj.strokeWidth
+                : 0;
+
+    }
+
+
+    if (opacityControl) {
+
+        opacityControl.value =
+            Math.round(
+                (obj.opacity ?? 1) * 100
+            );
+
+    }
+
+
+    if (rotationControl) {
+
+        rotationControl.value =
+            Math.round(
+                obj.angle || 0
+            );
+
+    }
+
+
+    if (
+        obj.type === "i-text" ||
+        obj.type === "text" ||
+        obj.type === "textbox"
+    ) {
+
+        if (
+            fontFamilyControl &&
+            obj.fontFamily
+        ) {
+
+            fontFamilyControl.value =
+                obj.fontFamily;
+
+        }
+
+
+        if (
+            fontSizeControl &&
+            obj.fontSize
+        ) {
+
+            fontSizeControl.value =
+                obj.fontSize;
+
+        }
+
+
+        if (
+            fontColorControl &&
+            typeof obj.fill === "string"
+        ) {
+
+            fontColorControl.value =
+                obj.fill;
+
+        }
+
+    }
+
+}
+
+
+canvas.on(
+    "selection:created",
+    syncProperties
 );
 
-canvas.add(line);
-
-canvas.setActiveObject(line);
-
-};
-const fillColor=document.getElementById("fillColor");
-
-const strokeColor=document.getElementById("strokeColor");
-
-const strokeWidth=document.getElementById("strokeWidth");
-fillColor.oninput=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj) return;
-
-obj.set("fill",fillColor.value);
-
-canvas.renderAll();
-
-};
-strokeColor.oninput=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj) return;
-
-obj.set("stroke",strokeColor.value);
-
-canvas.renderAll();
-
-};
-strokeWidth.oninput=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj) return;
-
-obj.set("strokeWidth",
-
-Number(strokeWidth.value));
-
-canvas.renderAll();
-
-};
-document.getElementById("deleteObject").onclick=()=>{
-
-const active=canvas.getActiveObject();
-
-if(!active) return;
-
-canvas.remove(active);
-
-canvas.discardActiveObject();
-
-canvas.renderAll();
-
-};
-canvas.on("selection:created",updateToolbar);
-canvas.on("selection:updated",updateToolbar);
-
-function updateToolbar(){
-
-const obj=canvas.getActiveObject();
-
-if(!obj) return;
-
-if(obj.fill){
-
-fillColor.value=obj.fill;
-
-}
-
-if(obj.stroke){
-
-strokeColor.value=obj.stroke;
-
-}
-
-if(obj.strokeWidth!=null){
-
-strokeWidth.value=obj.strokeWidth;
-
-}
-
-if(obj.fontSize){
-
-fontSize.value=obj.fontSize;
-
-}
-
-if(obj.fill){
-
-fontColor.value=obj.fill;
-
-}
-
-}
-// =========================
-// Layers
-// =========================
-
-function refreshLayers(){
-
-const list=document.getElementById("layersList");
-
-list.innerHTML="";
-
-const objects=canvas.getObjects();
-
-objects.slice().reverse().forEach((obj,index)=>{
-
-const item=document.createElement("div");
-
-item.className="layer-item";
-
-item.innerText=
-
-obj.type.toUpperCase()+" "+(objects.length-index);
-
-item.onclick=()=>{
-
-canvas.setActiveObject(obj);
-
-canvas.renderAll();
-
-refreshLayers();
-
-};
-
-if(canvas.getActiveObject()===obj){
-
-item.classList.add("active");
-
-}
-
-list.appendChild(item);
-
-});
-
-}
-
-canvas.on("object:added",refreshLayers);
-
-canvas.on("object:removed",refreshLayers);
-
-canvas.on("selection:created",refreshLayers);
-
-canvas.on("selection:updated",refreshLayers);
-
-canvas.on("selection:cleared",refreshLayers);
-document.getElementById("bringFront").onclick=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj)return;
-
-canvas.bringForward(obj);
-
-canvas.renderAll();
-
-refreshLayers();
-
-};
-document.getElementById("sendBack").onclick=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj)return;
-
-canvas.sendBackwards(obj);
-
-canvas.renderAll();
-
-refreshLayers();
-
-};
-document.getElementById("duplicateLayer").onclick=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj)return;
-
-obj.clone((clone)=>{
-
-clone.set({
-
-left:obj.left+20,
-
-top:obj.top+20
-
-});
-
-canvas.add(clone);
-
-canvas.setActiveObject(clone);
-
-canvas.renderAll();
-
-});
-
-};
-let zoomLevel=1;
-
-const zoomValue=document.getElementById("zoomValue");
-
-document.getElementById("zoomInBtn").onclick=()=>{
-
-zoomLevel+=0.1;
-
-canvas.setZoom(zoomLevel);
-
-zoomValue.innerText=Math.round(zoomLevel*100)+"%";
-
-};
-
-document.getElementById("zoomOutBtn").onclick=()=>{
-
-zoomLevel=Math.max(.2,zoomLevel-.1);
-
-canvas.setZoom(zoomLevel);
-
-zoomValue.innerText=Math.round(zoomLevel*100)+"%";
-
-};
-document.getElementById("exportImage").onclick=()=>{
-
-const link=document.createElement("a");
-
-link.download="astra-design.png";
-
-link.href=canvas.toDataURL({
-
-format:"png",
-
-quality:1
-
-});
-
-link.click();
-
-};
-document.getElementById("saveProject").onclick=()=>{
-
-const json=JSON.stringify(canvas.toJSON());
-
-localStorage.setItem("astra-project",json);
-
-alert("Project Saved Successfully!");
-
-};
-const themeBtn=document.getElementById("themeBtn");
-
-let dark=true;
-
-themeBtn.onclick=()=>{
-
-dark=!dark;
-
-document.body.classList.toggle("light-mode");
-
-themeBtn.innerHTML=dark?"🌙":"☀️";
-
-};
-const fillColor=document.getElementById("fillColor");
-const strokeColor=document.getElementById("strokeColor");
-const strokeWidth=document.getElementById("strokeWidth");
-const opacity=document.getElementById("opacity");
-const rotation=document.getElementById("rotation");
-fillColor.oninput=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj)return;
-
-obj.set("fill",fillColor.value);
-
-canvas.renderAll();
-
-};
-strokeColor.oninput=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj)return;
-
-obj.set("stroke",strokeColor.value);
-
-canvas.renderAll();
-
-};
-strokeWidth.oninput=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj)return;
-
-obj.set("strokeWidth",
-
-Number(strokeWidth.value));
-
-canvas.renderAll();
-
-};
-opacity.oninput=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj)return;
-
-obj.set("opacity",
-
-opacity.value/100);
-
-canvas.renderAll();
-
-};
-rotation.oninput=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj)return;
-
-obj.rotate(
-
-Number(rotation.value)
-
+canvas.on(
+    "selection:updated",
+    syncProperties
 );
 
-canvas.renderAll();
 
-};
-document.getElementById("duplicateBtn").onclick=()=>{
 
-const obj=canvas.getActiveObject();
+const cropToolBtn =
+document.getElementById("cropTool");
 
-if(!obj)return;
+if (cropToolBtn) {
 
-obj.clone((clone)=>{
+    cropToolBtn.addEventListener(
+        "click",
+        function () {
 
-clone.left+=20;
+            const obj =
+                canvas.getActiveObject();
 
-clone.top+=20;
 
-canvas.add(clone);
+            if (
+                !obj ||
+                obj.type !== "image"
+            ) {
 
-canvas.setActiveObject(clone);
+                alert(
+                    "Please select an image."
+                );
 
-canvas.renderAll();
+                return;
+            }
 
-});
 
-};
-document.getElementById("deleteBtn").onclick=()=>{
+            if (cropRect) {
 
-const obj=canvas.getActiveObject();
+                canvas.remove(cropRect);
 
-if(!obj)return;
+                cropRect = null;
 
-canvas.remove(obj);
+            }
 
-canvas.renderAll();
 
-};
-canvas.on("selection:created",syncProperties);
-canvas.on("selection:updated",syncProperties);
+            cropMode = true;
 
-function syncProperties(){
 
-const obj=canvas.getActiveObject();
+            cropRect =
+                new fabric.Rect(
+                    {
 
-if(!obj)return;
+                        left:
+                            (obj.left || 0) + 40,
 
-fillColor.value=obj.fill||"#000000";
+                        top:
+                            (obj.top || 0) + 40,
 
-strokeColor.value=obj.stroke||"#000000";
+                        width: 250,
 
-strokeWidth.value=obj.strokeWidth||0;
+                        height: 250,
 
-opacity.value=Math.round(
+                        fill:
+                            "rgba(0,0,0,0.15)",
 
-(obj.opacity??1)*100
+                        stroke:
+                            "#00A8FF",
 
-);
+                        strokeWidth: 2,
 
-rotation.value=Math.round(
+                        strokeDashArray:
+                            [6, 6],
 
-obj.angle||0
+                        transparentCorners:
+                            false,
 
-);
+                        cornerColor:
+                            "#00A8FF",
+
+                        hasRotatingPoint:
+                            false
+
+                    }
+                );
+
+
+            canvas.add(cropRect);
+
+            canvas.setActiveObject(cropRect);
+
+            canvas.requestRenderAll();
+
+        }
+    );
 
 }
-document.getElementById("cropTool").onclick=()=>{
 
-const obj=canvas.getActiveObject();
 
-if(!obj || obj.type!=="image"){
+const applyCropBtn =
+document.getElementById("applyCrop");
 
-alert("Please select an image.");
+if (applyCropBtn) {
 
-return;
+    applyCropBtn.addEventListener(
+        "click",
+        function () {
+
+            if (!cropMode || !cropRect) {
+
+                alert(
+                    "Please activate crop mode first."
+                );
+
+                return;
+
+            }
+
+
+            canvas.remove(cropRect);
+
+            cropRect = null;
+
+            cropMode = false;
+
+            canvas.discardActiveObject();
+
+            canvas.requestRenderAll();
+
+        }
+    );
+
+}
+
+
+
+const exportImageBtn =
+document.getElementById("exportImage");
+
+if (exportImageBtn) {
+
+    exportImageBtn.addEventListener(
+        "click",
+        function () {
+
+            const dataURL =
+                canvas.toDataURL(
+                    {
+
+                        format: "png",
+
+                        quality: 1,
+
+                        multiplier: 1
+
+                    }
+                );
+
+
+            const link =
+                document.createElement("a");
+
+
+            link.download =
+                "astra-design.png";
+
+
+            link.href =
+                dataURL;
+
+
+            link.click();
+
+        }
+    );
 
 }
 
-cropMode=true;
 
-cropRect=new fabric.Rect({
 
-left:obj.left+40,
+const saveProjectBtn =
+document.getElementById("saveProject");
 
-top:obj.top+40,
+if (saveProjectBtn) {
 
-width:250,
+    saveProjectBtn.addEventListener(
+        "click",
+        function () {
 
-height:250,
+            const projectData =
+                JSON.stringify(
+                    canvas.toJSON()
+                );
 
-fill:"rgba(0,0,0,.15)",
 
-stroke:"#00A8FF",
+            localStorage.setItem(
+                "astra-project",
+                projectData
+            );
 
-strokeWidth:2,
 
-strokeDashArray:[6,6],
+            alert(
+                "Project Saved Successfully!"
+            );
 
-transparentCorners:false
-
-});
-
-canvas.add(cropRect);
-
-canvas.setActiveObject(cropRect);
-
-};
-document.getElementById("applyCrop").onclick=()=>{
-
-if(!cropMode)return;
-
-alert("Crop feature coming in Part 3.");
-
-};
-function applyFilters(){
-
-const obj=canvas.getActiveObject();
-
-if(!obj || obj.type!=="image") return;
-
-obj.filters=[];
-
-obj.filters.push(
-
-new fabric.Image.filters.Brightness({
-
-brightness:Number(brightness.value)
-
-})
-
-);
-
-obj.filters.push(
-
-new fabric.Image.filters.Contrast({
-
-contrast:Number(contrast.value)
-
-})
-
-);
-
-obj.filters.push(
-
-new fabric.Image.filters.Saturation({
-
-saturation:Number(saturation.value)
-
-})
-
-);
-
-obj.filters.push(
-
-new fabric.Image.filters.Blur({
-
-blur:Number(blur.value)
-
-})
-
-);
-
-obj.applyFilters();
-
-canvas.renderAll();
+        }
+    );
 
 }
-const brightness=document.getElementById("brightness");
-const contrast=document.getElementById("contrast");
-const saturation=document.getElementById("saturation");
-const blur=document.getElementById("blur");
 
-brightness.oninput=applyFilters;
-contrast.oninput=applyFilters;
-saturation.oninput=applyFilters;
-blur.oninput=applyFilters;
-document.getElementById("grayBtn").onclick=()=>{
 
-const obj=canvas.getActiveObject();
+syncProperties();
 
-if(!obj)return;
-
-obj.filters=[
-
-new fabric.Image.filters.Grayscale()
-
-];
-
-obj.applyFilters();
-
-canvas.renderAll();
-
-};
-document.getElementById("sepiaBtn").onclick=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj)return;
-
-obj.filters=[
-
-new fabric.Image.filters.Sepia()
-
-];
-
-obj.applyFilters();
-
-canvas.renderAll();
-
-};
-document.getElementById("invertBtn").onclick=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj)return;
-
-obj.filters=[
-
-new fabric.Image.filters.Invert()
-
-];
-
-obj.applyFilters();
-
-canvas.renderAll();
-
-};
-document.getElementById("resetFilters").onclick=()=>{
-
-const obj=canvas.getActiveObject();
-
-if(!obj)return;
-
-obj.filters=[];
-
-obj.applyFilters();
-
-canvas.renderAll();
-
-brightness.value=0;
-contrast.value=0;
-saturation.value=0;
-blur.value=0;
-
-};
+canvas.requestRenderAll();

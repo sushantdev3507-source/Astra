@@ -1,0 +1,623 @@
+
+
+.astra-properties-panel {
+
+    width: 300px;
+    min-width: 300px;
+
+    height: 100%;
+
+    background:
+        linear-gradient(
+            180deg,
+            #101d31 0%,
+            #0b1728 100%
+        );
+
+    color: #dbe7f7;
+
+    border-left:
+        1px solid
+        rgba(255,255,255,0.08);
+
+    overflow-y: auto;
+
+    box-sizing: border-box;
+
+    padding: 0;
+
+    font-family:
+        "Poppins",
+        Arial,
+        sans-serif;
+}
+
+/* scrollbar */
+
+.astra-properties-panel::-webkit-scrollbar {
+
+    width: 7px;
+}
+
+.astra-properties-panel::-webkit-scrollbar-track {
+
+    background: #0b1728;
+}
+
+.astra-properties-panel::-webkit-scrollbar-thumb {
+
+    background: #29476f;
+
+    border-radius: 10px;
+}
+
+
+
+.astra-properties-header {
+
+    padding: 20px 18px;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,0.07);
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 10;
+
+    background:
+        rgba(16,29,49,0.96);
+
+    backdrop-filter:
+        blur(12px);
+}
+
+.astra-properties-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+.astra-property-icon {
+
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #4f46e5
+        );
+
+    color: white;
+
+    font-size: 19px;
+
+    font-weight: 700;
+
+    box-shadow:
+        0 8px 20px
+        rgba(37,99,235,0.25);
+}
+
+.astra-properties-title strong {
+
+    display: block;
+
+    color: #f8fbff;
+
+    font-size: 15px;
+}
+
+.astra-properties-title small {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color: #7f94b3;
+
+    font-size: 10px;
+}
+
+
+
+.astra-property-section {
+
+    padding: 18px;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,0.06);
+}
+
+.astra-section-title {
+
+    font-size: 11px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    font-weight: 700;
+
+    color: #7890b1;
+
+    margin-bottom: 14px;
+}
+
+
+
+.astra-property-row {
+
+    margin-bottom: 15px;
+}
+
+.astra-property-row:last-child {
+
+    margin-bottom: 0;
+}
+
+.astra-property-row > label {
+
+    display: block;
+
+    font-size: 11px;
+
+    color: #9eb1cb;
+
+    margin-bottom: 7px;
+}
+
+.astra-property-control {
+
+    width: 100%;
+}
+
+
+
+.astra-properties-panel input[type="text"],
+.astra-properties-panel input[type="number"],
+.astra-properties-panel select {
+
+    width: 100%;
+
+    height: 38px;
+
+    box-sizing: border-box;
+
+    border: 1px solid
+        rgba(255,255,255,0.08);
+
+    border-radius: 9px;
+
+    background: #162942;
+
+    color: #edf5ff;
+
+    padding: 0 11px;
+
+    outline: none;
+
+    font-family: inherit;
+}
+
+.astra-properties-panel input[type="number"]:focus,
+.astra-properties-panel select:focus {
+
+    border-color: #3b82f6;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(59,130,246,0.12);
+}
+
+.astra-properties-panel input[type="color"] {
+
+    width: 100%;
+
+    height: 38px;
+
+    border: 1px solid
+        rgba(255,255,255,0.08);
+
+    border-radius: 9px;
+
+    background: #162942;
+
+    padding: 4px;
+
+    cursor: pointer;
+}
+
+
+
+.astra-properties-panel input[type="range"] {
+
+    width: 100%;
+
+    accent-color: #3b82f6;
+
+    cursor: pointer;
+}
+
+.astra-range-wrap {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+.astra-range-wrap input {
+
+    flex: 1;
+}
+
+.astra-range-wrap span {
+
+    min-width: 32px;
+
+    text-align: right;
+
+    color: #b8c8dd;
+
+    font-size: 11px;
+}
+
+
+
+.astra-style-buttons,
+.astra-align-buttons,
+.astra-scale-buttons {
+
+    display: flex;
+
+    gap: 7px;
+}
+
+.astra-style-buttons button,
+.astra-align-buttons button,
+.astra-scale-buttons button {
+
+    flex: 1;
+
+    height: 36px;
+
+    border: 1px solid
+        rgba(255,255,255,0.08);
+
+    border-radius: 8px;
+
+    background: #162942;
+
+    color: #b8c8dd;
+
+    cursor: pointer;
+
+    transition:
+        0.2s ease;
+}
+
+.astra-style-buttons button:hover,
+.astra-align-buttons button:hover,
+.astra-scale-buttons button:hover {
+
+    background: #203a5e;
+
+    color: white;
+
+    border-color:
+        rgba(59,130,246,0.4);
+}
+
+.astra-style-buttons button.active {
+
+    background: #2563eb;
+
+    color: white;
+
+    border-color: #3b82f6;
+}
+
+
+.astra-properties-empty {
+
+    padding: 55px 25px;
+
+    text-align: center;
+}
+
+.astra-empty-icon {
+
+    width: 64px;
+    height: 64px;
+
+    margin:
+        0 auto 18px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #1d4ed8,
+            #4f46e5
+        );
+
+    color: white;
+
+    font-size: 28px;
+
+    box-shadow:
+        0 15px 35px
+        rgba(37,99,235,0.25);
+}
+
+.astra-properties-empty h3 {
+
+    color: #f5f9ff;
+
+    margin:
+        0 0 8px;
+}
+
+.astra-properties-empty p {
+
+    color: #8da2bf;
+
+    font-size: 12px;
+
+    line-height: 1.7;
+
+    margin: 0;
+}
+
+.astra-empty-hint {
+
+    margin-top: 18px;
+
+    padding: 11px;
+
+    border-radius: 10px;
+
+    background:
+        rgba(37,99,235,0.08);
+
+    color: #7591b5;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+
+
+.astra-tool-info {
+
+    padding: 35px 22px;
+
+    text-align: center;
+}
+
+.astra-tool-info-icon {
+
+    width: 65px;
+    height: 65px;
+
+    margin:
+        0 auto 18px;
+
+    border-radius: 18px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #4f46e5
+        );
+
+    color: white;
+
+    font-size: 25px;
+
+    font-weight: 700;
+}
+
+.astra-tool-info h3 {
+
+    color: white;
+
+    margin-bottom: 8px;
+}
+
+.astra-tool-info p {
+
+    color: #8da2bf;
+
+    font-size: 12px;
+
+    line-height: 1.7;
+}
+
+
+.astra-ai-property-card,
+.astra-template-property-card {
+
+    margin: 18px;
+
+    padding: 22px;
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #172d4d,
+            #11233c
+        );
+
+    border:
+        1px solid
+        rgba(59,130,246,0.16);
+
+    text-align: center;
+}
+
+.astra-ai-icon,
+.astra-template-icon {
+
+    width: 55px;
+    height: 55px;
+
+    margin:
+        0 auto 14px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #7c3aed
+        );
+
+    color: white;
+
+    font-size: 24px;
+}
+
+.astra-ai-property-card h3,
+.astra-template-property-card h3 {
+
+    color: #f5f9ff;
+
+    font-size: 15px;
+
+    margin:
+        0 0 8px;
+}
+
+.astra-ai-property-card p,
+.astra-template-property-card p {
+
+    color: #8fa4c0;
+
+    font-size: 11px;
+
+    line-height: 1.7;
+
+    margin-bottom: 18px;
+}
+
+
+
+.astra-primary-btn {
+
+    width: 100%;
+
+    height: 40px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #4f46e5
+        );
+
+    color: white;
+
+    font-family: inherit;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.astra-primary-btn:hover {
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 10px 25px
+        rgba(37,99,235,0.25);
+}
+
+
+
+.astra-frame-type {
+
+    padding: 12px;
+
+    border-radius: 9px;
+
+    background: #162942;
+
+    color: #dceaff;
+
+    text-transform: capitalize;
+}
+
+
+
+@media (max-width: 900px) {
+
+    .astra-properties-panel {
+
+        width: 270px;
+
+        min-width: 270px;
+
+    }
+}
+
+@media (max-width: 700px) {
+
+    .astra-properties-panel {
+
+        width: 100%;
+
+        min-width: 100%;
+
+        max-height: 45vh;
+
+    }
+}
