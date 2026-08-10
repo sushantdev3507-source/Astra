@@ -1,124 +1,227 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
+```
 <meta charset="UTF-8">
 
 <meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+    content="width=device-width, initial-scale=1.0">
 
-<title>ASTRA Workspace</title>
+<title>ASTRA | Continue</title>
 
-<link rel="stylesheet"
-href="css/workspace.css">
+<link
+    rel="stylesheet"
+    href="css/workspace.css">
 
-<link rel="stylesheet"
-href="css/responsive.css">
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
-rel="stylesheet">
+<link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+```
 
 </head>
 
 <body>
 
-<nav class="navbar">
+```
+<nav class="workspace-navbar">
 
-<div class="logo">
+    <div class="logo">
 
-<img src="assets/logo/astra-logo.png">
+        <a href="index.html">
 
-<span>ASTRA</span>
+            <img
+                src="assets/logo/Astra-logo.png"
+                alt="ASTRA Logo">
 
-</div>
+        </a>
 
-<div class="search">
+        <span>
+            ASTRA
+        </span>
 
-<input
-type="text"
-placeholder="Search projects...">
+    </div>
 
-</div>
 
-<div class="right">
+    <div class="nav-right">
 
-<i class="fa-regular fa-bell"></i>
+        <a
+            href="index.html"
+            class="home-btn">
 
-<div class="profile">
+            <i class="fa-solid fa-house"></i>
 
-<img src="assets/images/user.png">
+            Home
 
-<span>Guest</span>
+        </a>
 
-</div>
-
-</div>
+    </div>
 
 </nav>
 
-<section class="dashboard">
 
-<h1>
+<main class="workspace-main">
 
-Welcome Back 👋
+    <div class="welcome-section">
 
-</h1>
+        <div class="welcome-icon">
 
-<p>
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
 
-Choose what you want to create today.
+        </div>
 
-</p>
+        <span class="eyebrow">
+            WELCOME TO ASTRA
+        </span>
 
-<div class="editor-grid">
+        <h1>
+            Let's Create Something Amazing
+        </h1>
 
-<div class="editor-card">
+        <p>
+            Choose how you want to continue
+            with ASTRA Photo Editor.
+        </p>
 
-<i class="fa-regular fa-image"></i>
+    </div>
 
-<h2>Photo Editor</h2>
 
-<p>
+    <section class="continue-options">
 
-Professional AI Photo Editing
 
-</p>
+        <div class="continue-card sonam-card">
 
-<a href="photo-editor.html">
+            <div class="card-icon">
 
-Open Editor →
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
 
-</a>
+            </div>
 
-</div>
 
-<div class="editor-card">
+            <div class="card-content">
 
-<i class="fa-solid fa-file-powerpoint"></i>
+                <h2>
+                    Continue as Guest
+                </h2>
 
-<h2>Presentation Editor</h2>
+                <p>
+                    Start editing immediately
+                    without creating an account.
+                </p>
 
-<p>
+                <span class="card-info">
 
-Create Beautiful Slides
+                    <i class="fa-solid fa-bolt"></i>
 
-</p>
+                    Fast &amp; seamless editing
 
-<a href="ppt-editor.html">
+                </span>
 
-Open Editor →
+            </div>
 
-</a>
 
-</div>
+            <a
+                href="photo-editor.html?mode=guest"
+                class="continue-btn primary-btn">
 
-</div>
+                Continue as Guest
 
-</section>
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </a>
+
+        </div>
+
+
+        <div class="continue-card account-card">
+
+            <div class="card-icon">
+
+                <i class="fa-solid fa-user-plus"></i>
+
+            </div>
+
+
+            <div class="card-content">
+
+                <h2>
+                    Create Account
+                </h2>
+
+                <p>
+                    Create your ASTRA account
+                    to save projects and access
+                    your work anytime.
+                </p>
+
+                <span class="card-info">
+
+                    <i class="fa-solid fa-cloud"></i>
+
+                    Save your projects
+
+                </span>
+
+            </div>
+
+
+            <a
+                href="auth.html?mode=signup"
+                class="continue-btn secondary-btn">
+
+                Create Account
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </a>
+
+        </div>
+
+
+    </section>
+
+
+    <div class="workspace-info">
+
+        <i class="fa-solid fa-shield-halved"></i>
+
+        <span>
+            Your images stay secure and protected.
+        </span>
+
+    </div>
+
+</main>
+
+
+<script>
+
+    const params = new URLSearchParams(
+        window.location.search
+    );
+
+    const mode = params.get("mode");
+
+    if (mode === "sonam") {
+
+        document.title =
+            "ASTRA | Continue from Sonam";
+
+    } else if (mode === "guest") {
+
+        document.title =
+            "ASTRA | Guest Mode";
+
+    }
+
+</script>
+```
 
 </body>
 

@@ -1,325 +1,417 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
+```
+<meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
 
-    <title>ASTRA | Authentication</title>
+<title>ASTRA | Sign In & Sign Up</title>
 
-    <link rel="stylesheet" href="css/auth.css">
-    <link rel="stylesheet" href="css/responsive.css">
+<link rel="stylesheet" href="css/auth.css">
+<link rel="stylesheet" href="css/responsive.css">
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+```
 
 </head>
 
 <body>
 
-    <section class="auth-container">
+```
+<section class="auth-container">
 
-        <!-- LEFT PANEL -->
+    <div class="left-panel">
 
-        <div class="left-panel">
+        <a href="index.html">
 
-            <img src="assets/logo/astra-logo.png"
+            <img
+                src="assets/logo/Astra-logo.png"
                 alt="ASTRA Logo">
-
-            <h1>
-
-                Inspired by the Stars
-
-            </h1>
-
-            <h2>
-
-                Limitless Creativity
-
-            </h2>
-
-            <p>
-
-                Create stunning photos,
-                presentations and AI designs
-                using one powerful editor.
-
-            </p>
-
-        </div>
-
-        <!-- RIGHT PANEL -->
-
-        <div class="right-panel">
-
-            <div class="auth-card">
-
-                <div class="tabs">
-
-                    <button
-                        id="signinTab"
-                        class="tab active">
-
-                        Sign In
-
-                     </button>
-
-                    <button
-                        id="signupTab"
-                        class="tab">
-
-                        Sign Up
-
-                    </button>
-
-                </div>
-                <!-- ==========================
-      SIGN IN FORM
-========================== -->
-
-<form id="signinForm" class="auth-form active-form">
-
-    <h2>Welcome Back 👋</h2>
-
-    <p class="subtitle">
-
-        Sign in to continue using ASTRA
-
-    </p>
-
-    <div class="input-group">
-
-        <label>Email Address</label>
-
-        <input
-    id="loginEmail"
-    type="email"
-    placeholder="Enter your email"
-    required>
-
-    </div>
-
-    <div class="input-group">
-
-        <label>Password</label>
-
-        <div class="password-box">
-
-            <input
-                id="password"
-                type="password"
-                placeholder="Password"
-                required>
-
-            <button
-                id="togglePassword"
-                type="button">
-
-                <i class="fa-solid fa-eye"></i>
-
-            </button>
-
-        </div>
-
-    </div>
-
-    <button class="login-btn">
-
-        Sign In
-
-    </button>
-
-    <a
-        href="workspace.html"
-        class="guest-btn">
-
-        Continue as Guest →
-
-    </a>
-
-</form>
-
-<!-- ==========================
-      SIGN UP FORM
-========================== -->
-
-<form id="signupForm" class="auth-form">
-
-    <h2>Create Account 🚀</h2>
-
-    <p class="subtitle">
-
-        Start your creative journey with ASTRA.
-
-    </p>
-
-    <!-- Full Name -->
-
-    <div class="input-group">
-
-        <label>Full Name</label>
-
-        <input
-            type="text"
-            placeholder="Enter your full name"
-            required>
-
-    </div>
-
-    <!-- Email -->
-
-    <div class="input-group">
-
-        <label>Email Address</label>
-
-        <input
-            id="signupEmail"
-            type="email"
-            placeholder="Enter your email"
-            required>
-
-    </div>
-
-    <!-- Mobile -->
-
-    <div class="input-group">
-
-        <label>Mobile Number</label>
-
-        <input
-            id = "mobile"
-            type="tel"
-            placeholder="Enter mobile number"
-            required>
-
-    </div>
-
-    <!-- Password -->
-
-    <div class="input-group">
-
-        <label>Password</label>
-
-        <div class="password-box">
-
-            <input
-                id="signupPassword"
-                type="password"
-                placeholder="Create password"
-                required>
-
-            <button
-                id="toggleSignupPassword"
-                type="button">
-
-                <i class="fa-solid fa-eye"></i>
-
-            </button>
-
-        </div>
-
-    </div>
-
-    <!-- Confirm Password -->
-
-    <div class="input-group">
-
-        <label>Confirm Password</label>
-
-        <div class="password-box">
-
-            <input
-                id="confirmPassword"
-                type="password"
-                placeholder="Confirm password"
-                required>
-
-            <button
-                id="toggleConfirmPassword"
-                type="button">
-
-                <i class="fa-solid fa-eye"></i>
-
-            </button>
-
-        </div>
-
-    </div>
-
-    <!-- Terms -->
-
-    <div class="options">
-
-        <label>
-
-            <input type="checkbox" required>
-
-            I agree to Terms & Conditions
-
-        </label>
-
-    </div>
-
-    <!-- Create -->
-
-    <button class="login-btn">
-
-        Create Account
-
-    </button>
-
-    <div class="divider">
-
-        <span>OR</span>
-
-    </div>
-
-    <button
-        type="button"
-        class="google-btn">
-
-        <i class="fa-brands fa-google"></i>
-
-        Continue with Google
-
-    </button>
-
-    <p class="signup-text">
-
-        Already have an account?
-
-        <a href="#" id="goSignin">
-
-            Sign In
 
         </a>
 
-    </p>
+        <h1>
+            Inspired by the Stars
+        </h1>
 
-    <a
-        href="workspace.html"
-        class="guest-btn">
+        <h2>
+            Limitless Creativity
+        </h2>
 
-        Continue as Guest
-        <i class="fa-solid fa-arrow-right"></i>
+        <p>
+            Create stunning images
+            using one powerful editor.
+        </p>
 
-    </a>
-
-</form>
+    </div>
 
 
+    <div class="right-panel">
+
+        <div class="auth-card">
+
+            <div class="auth-header">
+
+                <h1>
+                    Welcome to ASTRA
+                </h1>
+
+                <p>
+                    Sign in or create an account to
+                    unlock the full potential of ASTRA.
+                </p>
 
             </div>
 
+
+            <div class="tabs">
+
+                <button
+                    id="signinTab"
+                    class="tab active"
+                    type="button">
+
+                    Sign In
+
+                </button>
+
+
+                <button
+                    id="signupTab"
+                    class="tab"
+                    type="button">
+
+                    Sign Up
+
+                </button>
+
+            </div>
+
+
+            <!-- SIGN IN -->
+
+            <form
+                id="signinForm"
+                class="auth-form active-form"
+                novalidate>
+
+                <h2>
+                    Welcome Back!
+                </h2>
+
+                <p class="subtitle">
+                    Sign in to continue using ASTRA
+                </p>
+
+
+                <div class="input-group">
+
+                    <label for="loginEmail">
+                        Email Address
+                    </label>
+
+                    <input
+                        id="loginEmail"
+                        name="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        autocomplete="email"
+                        required>
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <div class="password-box">
+
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            placeholder="Password"
+                            autocomplete="current-password"
+                            required>
+
+                        <button
+                            id="togglePassword"
+                            type="button"
+                            aria-label="Show or hide password">
+
+                            <i class="fa-solid fa-eye"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="login-btn">
+
+                    Sign In
+
+                </button>
+
+
+                <a
+                    href="#"
+                    id="forgotPassword"
+                    class="forgot-password">
+
+                    Forgot Password?
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
+
+
+                <a
+                    href="workspace.html?mode=guest"
+                    class="guest-btn">
+
+                    Continue as Guest
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
+
+            </form>
+
+
+      
+
+            <form
+                id="signupForm"
+                class="auth-form"
+                novalidate>
+
+                <h2>
+                    Create Account
+                </h2>
+
+                <p class="subtitle">
+                    Start your creative journey with ASTRA.
+                </p>
+
+
+                <div class="input-group">
+
+                    <label for="fullName">
+                        Full Name
+                    </label>
+
+                    <input
+                        id="fullName"
+                        name="fullName"
+                        type="text"
+                        placeholder="Enter your full name"
+                        autocomplete="name"
+                        required>
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="signupEmail">
+                        Email Address
+                    </label>
+
+                    <input
+                        id="signupEmail"
+                        name="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        autocomplete="email"
+                        required>
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="mobile">
+                        Mobile Number
+                    </label>
+
+                    <input
+                        id="mobile"
+                        name="mobile"
+                        type="tel"
+                        placeholder="Enter 10-digit mobile number"
+                        inputmode="numeric"
+                        maxlength="10"
+                        autocomplete="tel"
+                        required>
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="signupPassword">
+                        Password
+                    </label>
+
+                    <div class="password-box">
+
+                        <input
+                            id="signupPassword"
+                            name="password"
+                            type="password"
+                            placeholder="Create password"
+                            autocomplete="new-password"
+                            required>
+
+                        <button
+                            id="toggleSignupPassword"
+                            type="button"
+                            aria-label="Show or hide password">
+
+                            <i class="fa-solid fa-eye"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="confirmPassword">
+                        Confirm Password
+                    </label>
+
+                    <div class="password-box">
+
+                        <input
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            type="password"
+                            placeholder="Confirm password"
+                            autocomplete="new-password"
+                            required>
+
+                        <button
+                            id="toggleConfirmPassword"
+                            type="button"
+                            aria-label="Show or hide password">
+
+                            <i class="fa-solid fa-eye"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="options">
+
+                    <label for="terms">
+
+                        <input
+                            id="terms"
+                            name="terms"
+                            type="checkbox"
+                            required>
+
+                        I agree to
+                        Terms &amp; Conditions
+
+                    </label>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="login-btn">
+
+                    Create Account
+
+                </button>
+
+
+                <div class="divider">
+
+                    <span>
+                        OR
+                    </span>
+
+                </div>
+
+
+                <button
+                    id="googleSignup"
+                    type="button"
+                    class="google-btn">
+
+                    <i class="fa-brands fa-google"></i>
+
+                    Continue with Google
+
+                </button>
+
+
+                <p class="signup-text">
+
+                    Already have an account?
+
+                    <a
+                        href="#"
+                        id="goSignin">
+
+                        Sign In
+
+                    </a>
+
+                </p>
+
+
+                <a
+                    href="workspace.html?mode=guest"
+                    class="guest-btn">
+
+                    Continue as Guest
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
+
+            </form>
+
         </div>
 
-    </section>
+    </div>
 
-    <script src="js/auth.js"></script>
+</section>
+
+
+<script src="js/auth.js"></script>
+```
 
 </body>
 

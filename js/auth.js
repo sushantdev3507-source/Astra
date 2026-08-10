@@ -1,14 +1,22 @@
-// ==============================
-// Tabs
-// ==============================
 
-const signinTab = document.getElementById("signinTab");
-const signupTab = document.getElementById("signupTab");
+const signinTab =
+document.getElementById("signinTab");
 
-const signinForm = document.getElementById("signinForm");
-const signupForm = document.getElementById("signupForm");
+const signupTab =
+document.getElementById("signupTab");
 
-signinTab.onclick = () => {
+const signinForm =
+document.getElementById("signinForm");
+
+const signupForm =
+document.getElementById("signupForm");
+
+
+function showSignin() {
+
+    if (!signinTab || !signupTab) return;
+
+    if (!signinForm || !signupForm) return;
 
     signinTab.classList.add("active");
     signupTab.classList.remove("active");
@@ -16,9 +24,13 @@ signinTab.onclick = () => {
     signinForm.classList.add("active-form");
     signupForm.classList.remove("active-form");
 
-};
+}
 
-signupTab.onclick = () => {
+function showSignup() {
+
+    if (!signinTab || !signupTab) return;
+
+    if (!signinForm || !signupForm) return;
 
     signupTab.classList.add("active");
     signinTab.classList.remove("active");
@@ -26,104 +38,395 @@ signupTab.onclick = () => {
     signupForm.classList.add("active-form");
     signinForm.classList.remove("active-form");
 
-};
+}
 
-// ==============================
-// Password Toggle
-// ==============================
+if (signinTab) {
 
-function togglePassword(inputId, buttonId){
-
-    const input=document.getElementById(inputId);
-
-    const button=document.getElementById(buttonId);
-
-    if(!input || !button) return;
-
-    button.onclick=()=>{
-
-        if(input.type==="password"){
-
-            input.type="text";
-
-            button.innerHTML='<i class="fa-solid fa-eye-slash"></i>';
-
-        }
-
-        else{
-
-            input.type="password";
-
-            button.innerHTML='<i class="fa-solid fa-eye"></i>';
-
-        }
-
-    }
+    signinTab.addEventListener(
+        "click",
+        showSignin
+    );
 
 }
 
-togglePassword("password","togglePassword");
-togglePassword("signupPassword","toggleSignupPassword");
-togglePassword("confirmPassword","toggleConfirmPassword");
+if (signupTab) {
 
-// ==============================
-// Validation
-// ==============================
+    signupTab.addEventListener(
+        "click",
+        showSignup
+    );
 
-signinForm.addEventListener("submit",(e)=>{
+}
 
-    e.preventDefault();
 
-    const email=document.getElementById("loginEmail").value.trim();
 
-    const pass=document.getElementById("password").value.trim();
+function togglePassword(
+    inputId,
+    buttonId
+) {
 
-    if(email==="" || pass===""){
+    const input =
+        document.getElementById(inputId);
 
-        alert("Please enter Email and Password.");
+    const button =
+        document.getElementById(buttonId);
 
-        return;
-
-    }
-
-    alert("Login Successful!");
-
-    window.location.href="workspace.html";
-
-});
-
-signupForm.addEventListener("submit",(e)=>{
-
-    e.preventDefault();
-
-    const name=document.getElementById("fullName").value.trim();
-
-    const email=document.getElementById("signupEmail").value.trim();
-
-    const mobile=document.getElementById("mobile").value.trim();
-
-    const pass=document.getElementById("signupPassword").value;
-
-    const confirm=document.getElementById("confirmPassword").value;
-
-    if(name==="" || email==="" || mobile===""){
-
-        alert("Please fill all fields.");
+    if (!input || !button) {
 
         return;
 
     }
 
-    if(pass!==confirm){
+    button.addEventListener(
+        "click",
+        function () {
 
-        alert("Passwords do not match.");
+            const isPassword =
+                input.type === "password";
 
-        return;
+            input.type =
+                isPassword
+                    ? "text"
+                    : "password";
 
-    }
+            button.innerHTML =
+                isPassword
+                    ? '<i class="fa-solid fa-eye-slash"></i>'
+                    : '<i class="fa-solid fa-eye"></i>';
 
-    alert("Account Created Successfully!");
+        }
+    );
 
-    window.location.href="workspace.html";
+}
 
-});
+togglePassword(
+    "password",
+    "togglePassword"
+);
+
+togglePassword(
+    "signupPassword",
+    "toggleSignupPassword"
+);
+
+togglePassword(
+    "confirmPassword",
+    "toggleConfirmPassword"
+);
+
+
+
+function isValidEmail(email) {
+
+    const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    return emailPattern.test(email);
+
+}
+
+
+function isValidMobile(mobile) {
+
+    return /^\d{10}$/.test(mobile);
+
+}
+
+
+function isValidPassword(password) {
+
+    return password.length >= 6;
+
+}
+
+
+if (signinForm) {
+
+    signinForm.addEventListener(
+        "submit",
+        function (event) {
+
+            event.preventDefault();
+
+            const emailInput =
+                document.getElementById(
+                    "loginEmail"
+                );
+
+            const passwordInput =
+                document.getElementById(
+                    "password"
+                );
+
+            if (
+                !emailInput ||
+                !passwordInput
+            ) {
+
+                console.error(
+                    "ASTRA: Login fields not found."
+                );
+
+                return;
+
+            }
+
+            const email =
+                emailInput.value.trim();
+
+            const password =
+                passwordInput.value;
+
+            if (
+                email === "" ||
+                password === ""
+            ) {
+
+                alert(
+                    "Please enter Email and Password."
+                );
+
+                return;
+
+            }
+
+            if (
+                !isValidEmail(email)
+            ) {
+
+                alert(
+                    "Please enter a valid email address."
+                );
+
+                emailInput.focus();
+
+                return;
+
+            }
+
+            sessionStorage.setItem(
+                "ASTRA_LOGGED_IN",
+                "true"
+            );
+
+            sessionStorage.setItem(
+                "ASTRA_USER_EMAIL",
+                email
+            );
+
+            alert(
+                "Login Successful!"
+            );
+
+            window.location.href =
+                "photo-editor.html";
+
+        }
+    );
+
+}
+
+
+if (signupForm) {
+
+    signupForm.addEventListener(
+        "submit",
+        function (event) {
+
+            event.preventDefault();
+
+            const nameInput =
+                document.getElementById(
+                    "fullName"
+                );
+
+            const emailInput =
+                document.getElementById(
+                    "signupEmail"
+                );
+
+            const mobileInput =
+                document.getElementById(
+                    "mobile"
+                );
+
+            const passwordInput =
+                document.getElementById(
+                    "signupPassword"
+                );
+
+            const confirmInput =
+                document.getElementById(
+                    "confirmPassword"
+                );
+
+            if (
+                !nameInput ||
+                !emailInput ||
+                !mobileInput ||
+                !passwordInput ||
+                !confirmInput
+            ) {
+
+                console.error(
+                    "ASTRA: Signup fields not found."
+                );
+
+                return;
+
+            }
+
+            const name =
+                nameInput.value.trim();
+
+            const email =
+                emailInput.value.trim();
+
+            const mobile =
+                mobileInput.value.trim();
+
+            const password =
+                passwordInput.value;
+
+            const confirmPassword =
+                confirmInput.value;
+
+            if (
+                name === "" ||
+                email === "" ||
+                mobile === "" ||
+                password === "" ||
+                confirmPassword === ""
+            ) {
+
+                alert(
+                    "Please fill all fields."
+                );
+
+                return;
+
+            }
+
+            if (name.length < 2) {
+
+                alert(
+                    "Please enter a valid name."
+                );
+
+                nameInput.focus();
+
+                return;
+
+            }
+
+            if (
+                !isValidEmail(email)
+            ) {
+
+                alert(
+                    "Please enter a valid email address."
+                );
+
+                emailInput.focus();
+
+                return;
+
+            }
+
+            if (
+                !isValidMobile(mobile)
+            ) {
+
+                alert(
+                    "Please enter a valid 10-digit mobile number."
+                );
+
+                mobileInput.focus();
+
+                return;
+
+            }
+
+            if (
+                !isValidPassword(password)
+            ) {
+
+                alert(
+                    "Password must contain at least 6 characters."
+                );
+
+                passwordInput.focus();
+
+                return;
+
+            }
+
+            if (
+                password !==
+                confirmPassword
+            ) {
+
+                alert(
+                    "Passwords do not match."
+                );
+
+                confirmInput.focus();
+
+                return;
+
+            }
+
+            sessionStorage.setItem(
+                "ASTRA_USER_NAME",
+                name
+            );
+
+            sessionStorage.setItem(
+                "ASTRA_USER_EMAIL",
+                email
+            );
+
+            sessionStorage.setItem(
+                "ASTRA_USER_MOBILE",
+                mobile
+            );
+
+            sessionStorage.setItem(
+                "ASTRA_LOGGED_IN",
+                "true"
+            );
+
+            alert(
+                "Account Created Successfully!"
+            );
+
+            window.location.href =
+                "photo-editor.html";
+
+        }
+    );
+
+}
+
+
+
+console.log(
+    "ASTRA: Authentication System Loaded Successfully."
+);
+
+
+const urlParams = new URLSearchParams(
+    window.location.search
+);
+
+const authMode = urlParams.get("mode");
+
+if (authMode === "signup") {
+
+    showSignup();
+
+} else {
+
+    showSignin();
+
+}

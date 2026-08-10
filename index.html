@@ -1,60 +1,65 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Astra | Photo & PPT Editor</title>
+```
+<meta charset="UTF-8">
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/responsive.css">
+<meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Astra | Photo Editor</title>
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/responsive.css">
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+```
+
 </head>
 
 <body>
-    <!-- Background Effects -->
 
-<div class="background">
+```
+<div class="blur blur1"></div>
+<div class="blur blur2"></div>
+<div class="blur blur3"></div>
 
-    <div class="blur blur1"></div>
-
-    <div class="blur blur2"></div>
-
-    <div class="blur blur3"></div>
-
-</div>
-    <header class="header">
+<header class="header">
 
     <div class="container">
 
-        <!-- Logo -->
         <div class="logo">
-            <img src="assets/logo/astra-logo.png" alt="Astra Logo">
+            <a href="index.html">
+                <img
+                    src="assets/logo/Astra-logo.png"
+                    alt="Astra Logo">
+            </a>
         </div>
 
-        <!-- Navigation -->
         <nav class="navbar">
 
-            <a href="#">Home</a>
-            <a href="#">Features</a>
-            <a href="#">Templates</a>
-            <a href="#">Pricing</a>
-            <a href="#">Support</a>
+            <a href="index.html#home">Home</a>
+
+            <a href="index.html#features">Features</a>
+
+            <a href="index.html#support">Support</a>
 
         </nav>
 
-        <!-- Right Button -->
         <div class="header-btn">
 
-            <a href="login.html" class="signin-btn">
+            <a
+                href="auth.html"
+                class="signin-btn">
 
                 <i class="fa-solid fa-user"></i>
 
@@ -67,549 +72,522 @@
     </div>
 
 </header>
-<!-- ===========================
-        HERO SECTION
-=========================== -->
 
-<section class="hero">
 
-    <!-- Left Content -->
+<main>
 
-    <div class="hero-left">
+    <section
+        class="hero"
+        id="home">
 
-        <span class="tagline">
-            ✨ AI Powered Editor
-        </span>
+        <div class="container hero-container">
 
-        <h1>
+            <div class="hero-left">
 
-            Inspired by the Stars
+                <span class="tagline">
+                    ✨ AI Powered Editor
+                </span>
 
-        </h1>
+                <h1>
+                    Inspired by the Stars
+                </h1>
 
-        <h2>
+                <h2>
+                    Limitless Creativity
+                </h2>
 
-            Limitless Creativity
+                <p>
+                    Create, edit and design stunning
+                    images using powerful editing tools.
+                    No experience required.
+                </p>
 
-        </h2>
+                <div class="hero-buttons">
 
-        <p>
+                    <a
+                        href="auth.html"
+                        class="btn-primary">
 
-            Create, edit and design stunning Photos &
-            Presentations using powerful AI tools.
+                        <i class="fa-solid fa-user-plus"></i>
 
-            No experience required.
+                        Create Account
 
-        </p>
+                    </a>
 
-        <div class="hero-buttons">
+                    <a
+                        href="workspace.html?mode=guest"
+                        class="btn-secondary">
 
-            <a href="signup.html" class="btn-primary">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
 
-                Create Account
+                        Continue as Guest
 
-            </a>
+                    </a>
 
-            <a href="workspace.html" class="btn-secondary">
-
-                Continue as Guest
-
-            </a>
-
-        </div>
-
-    </div>
-
-    <!-- Right -->
-
-    <div class="hero-right">
-
-        <img
-            src="assets/logo/astra-logo.png"
-            alt="Astra Logo">
-
-    </div>
-
-</section>
-<!-- ===========================
-        FEATURES SECTION
-=========================== -->
-
-<section class="features">
-
-    <div class="section-title">
-
-        <h2>Powerful Features</h2>
-
-        <p>
-            Everything you need to create stunning
-            photos and presentations.
-        </p>
-
-    </div>
-
-    <div class="feature-grid">
-
-        <div class="feature-card">
-
-            <i class="fa-solid fa-image"></i>
-
-            <h3>Photo Editor</h3>
-
-            <p>
-
-                Crop, Rotate, Resize,
-                Filters, AI Editing,
-                Layers and more.
-
-            </p>
-
-        </div>
-
-        <div class="feature-card">
-
-            <i class="fa-solid fa-file-powerpoint"></i>
-
-            <h3>Presentation Editor</h3>
-
-            <p>
-
-                Create professional slides,
-                templates, charts and export.
-
-            </p>
-
-        </div>
-
-        <div class="feature-card">
-
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-
-            <h3>AI Image Generator</h3>
-
-            <p>
-
-                Generate beautiful images
-                from simple text prompts.
-
-            </p>
-
-        </div>
-
-        <div class="feature-card">
-
-            <i class="fa-solid fa-cloud"></i>
-
-            <h3>Cloud Projects</h3>
-
-            <p>
-
-                Save your work securely and
-                continue from any device.
-
-            </p>
-
-        </div>
-
-        <div class="feature-card">
-
-            <i class="fa-solid fa-download"></i>
-
-            <h3>Export</h3>
-
-            <p>
-
-                Export as PNG, JPG,
-                PDF and PPTX.
-
-            </p>
-
-        </div>
-
-        <div class="feature-card">
-
-            <i class="fa-solid fa-mobile-screen-button"></i>
-
-            <h3>Responsive</h3>
-
-            <p>
-
-                Works perfectly on
-                Desktop, Tablet and Mobile.
-
-            </p>
-
-        </div>
-
-    </div>
-
-</section>
-<!-- ===========================
-        WHY ASTRA
-=========================== -->
-
-<section class="why-astra">
-
-    <div class="why-left">
-
-        <span class="section-tag">
-
-            WHY ASTRA
-
-        </span>
-
-        <h2>
-
-            Designed for Modern
-            Creators
-
-        </h2>
-
-        <p>
-
-            Astra combines powerful Photo Editing,
-            Presentation Design and AI tools into
-            one modern platform.
-
-        </p>
-
-    </div>
-
-    <div class="why-right">
-
-        <div class="why-card">
-
-            <i class="fa-solid fa-bolt"></i>
-
-            <h3>Fast Performance</h3>
-
-            <p>
-
-                Lightning fast editing powered by
-                HTML5 Canvas.
-
-            </p>
-
-        </div>
-
-        <div class="why-card">
-
-            <i class="fa-solid fa-robot"></i>
-
-            <h3>AI Powered</h3>
-
-            <p>
-
-                AI Image Generation,
-                Smart Editing and
-                Background Removal.
-
-            </p>
-
-        </div>
-
-        <div class="why-card">
-
-            <i class="fa-solid fa-cloud"></i>
-
-            <h3>Cloud Projects</h3>
-
-            <p>
-
-                Save and continue
-                from any device.
-
-            </p>
-
-        </div>
-
-        <div class="why-card">
-
-            <i class="fa-solid fa-shield-halved"></i>
-
-            <h3>Secure Storage</h3>
-
-            <p>
-
-                Your projects remain
-                secure and protected.
-
-            </p>
-
-        </div>
-
-    </div>
-
-</section>
-<!-- ===========================
-        STATISTICS
-=========================== -->
-
-<section class="stats">
-
-    <div class="stat-box">
-
-        <h2>50K+</h2>
-
-        <p>Active Users</p>
-
-    </div>
-
-    <div class="stat-box">
-
-        <h2>10M+</h2>
-
-        <p>Images Edited</p>
-
-    </div>
-
-    <div class="stat-box">
-
-        <h2>500K+</h2>
-
-        <p>Presentations Created</p>
-
-    </div>
-
-    <div class="stat-box">
-
-        <h2>4.9★</h2>
-
-        <p>User Rating</p>
-
-    </div>
-
-</section>
-
-
-<!-- ===========================
-      TESTIMONIALS
-=========================== -->
-
-<section class="testimonials">
-
-    <div class="section-title">
-
-        <h2>What Our Users Say</h2>
-
-        <p>
-
-            Trusted by creators around the world.
-
-        </p>
-
-    </div>
-
-    <div class="testimonial-grid">
-
-        <div class="testimonial-card">
-
-            <div class="stars">
-
-                ⭐⭐⭐⭐⭐
+                </div>
 
             </div>
 
-            <p>
 
-                Astra completely changed the way
-                I edit my images. Everything I need
-                is available in one place.
+            <div class="hero-right">
 
-            </p>
-
-            <h4>
-
-                Sarah Johnson
-
-            </h4>
-
-            <span>
-
-                Graphic Designer
-
-            </span>
-
-        </div>
-
-        <div class="testimonial-card">
-
-            <div class="stars">
-
-                ⭐⭐⭐⭐⭐
+                <img
+                    src="assets/logo/Astra-logo.png"
+                    alt="Astra Photo Editor">
 
             </div>
 
-            <p>
-
-                The Presentation Editor is clean,
-                modern and extremely easy to use.
-
-            </p>
-
-            <h4>
-
-                Michael Lee
-
-            </h4>
-
-            <span>
-
-                Business Consultant
-
-            </span>
-
         </div>
 
-        <div class="testimonial-card">
+    </section>
 
-            <div class="stars">
 
-                ⭐⭐⭐⭐⭐
+    <section
+        class="features-section"
+        id="features">
+
+        <div class="container">
+
+            <div class="section-title">
+
+                <h2>
+                    Powerful Features
+                </h2>
+
+                <p>
+                    Everything you need to create
+                    stunning images.
+                </p>
 
             </div>
 
-            <p>
 
-                Astra combines Canva and Photoshop
-                style tools beautifully.
+            <div class="feature-grid">
 
-            </p>
+                <div class="feature-card">
 
-            <h4>
+                    <i class="fa-solid fa-image"></i>
 
-                Emily Davis
+                    <h3>
+                        Photo Editor
+                    </h3>
 
-            </h4>
+                    <p>
+                        Crop, Rotate, Resize,
+                        Filters, AI Editing,
+                        Layers and more.
+                    </p>
 
-            <span>
+                </div>
 
-                UI Designer
 
-            </span>
+                <div class="feature-card">
 
-        </div>
+                    <i class="fa-solid fa-download"></i>
 
-    </div>
+                    <h3>
+                        Export
+                    </h3>
 
-</section>
-<!-- ===========================
-        CTA SECTION
-=========================== -->
+                    <p>
+                        Export your edited images
+                        as PNG, JPG and PDF
+                        with high quality.
+                    </p>
 
-<section class="cta">
+                </div>
 
-    <h2>Ready to Create Something Amazing?</h2>
 
-    <p>
+                <div class="feature-card">
 
-        Join Astra today and start editing
-        photos and presentations for free.
+                    <i class="fa-solid fa-mobile-screen-button"></i>
 
-    </p>
+                    <h3>
+                        Responsive
+                    </h3>
 
-    <div class="cta-buttons">
+                    <p>
+                        Works perfectly on
+                        Desktop, Tablet and Mobile.
+                    </p>
 
-        <a href="signup.html" class="btn-primary">
+                </div>
 
-            Create Free Account
-
-        </a>
-
-        <a href="workspace.html" class="btn-secondary">
-
-            Continue as Guest
-
-        </a>
-
-    </div>
-
-</section>
-<section class="faq">
-
-    <div class="section-title">
-
-        <h2>Frequently Asked Questions</h2>
-
-    </div>
-
-    <div class="faq-container">
-
-        <div class="faq-item">
-
-            <h3>Is Astra free to use?</h3>
-
-            <p>
-                Yes. You can start with Guest Mode
-                or create a free account.
-            </p>
+            </div>
 
         </div>
 
-        <div class="faq-item">
+    </section>
 
-            <h3>Do I need to install anything?</h3>
 
-            <p>
+    <section class="why-section">
 
-                No. Astra runs directly
-                in your browser.
+        <div class="container why-container">
 
-            </p>
+            <div class="why-left">
+
+                <span class="section-tag">
+                    WHY ASTRA
+                </span>
+
+                <h2>
+                    Designed for Modern
+                    Creators
+                </h2>
+
+                <p>
+                    Astra combines powerful photo editing
+                    and creative tools into one modern platform.
+                </p>
+
+            </div>
+
+
+            <div class="why-right">
+
+                <div class="why-card">
+
+                    <i class="fa-solid fa-bolt"></i>
+
+                    <h3>
+                        Fast Performance
+                    </h3>
+
+                    <p>
+                        Lightning fast editing powered by
+                        HTML5 Canvas.
+                    </p>
+
+                </div>
+
+
+                <div class="why-card">
+
+                    <i class="fa-solid fa-robot"></i>
+
+                    <h3>
+                        AI Powered
+                    </h3>
+
+                    <p>
+                        AI Image Generation,
+                        Smart Editing and
+                        Background Removal.
+                    </p>
+
+                </div>
+
+
+                <div class="why-card">
+
+                    <i class="fa-solid fa-shield-halved"></i>
+
+                    <h3>
+                        Secure Storage
+                    </h3>
+
+                    <p>
+                        Your projects remain
+                        secure and protected.
+                    </p>
+
+                </div>
+
+            </div>
 
         </div>
 
-        <div class="faq-item">
+    </section>
 
-            <h3>Can I edit presentations?</h3>
 
-            <p>
+    <section class="stats-section">
 
-                Yes.
-                Astra includes a complete
-                Presentation Editor.
+        <div class="container stats-container">
 
-            </p>
+            <div class="stat-box">
+
+                <h2>50K+</h2>
+
+                <p>Active Users</p>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <h2>10M+</h2>
+
+                <p>Images Edited</p>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <h2>4.9★</h2>
+
+                <p>User Rating</p>
+
+            </div>
 
         </div>
 
-    </div>
+    </section>
 
-</section>
+
+    <section class="testimonial-section">
+
+        <div class="container">
+
+            <div class="section-title">
+
+                <h2>
+                    What Our Users Say
+                </h2>
+
+                <p>
+                    Trusted by creators around the world.
+                </p>
+
+            </div>
+
+
+            <div class="testimonial-grid">
+
+                <div class="testimonial-card">
+
+                    <div class="stars">
+                        ★★★★★
+                    </div>
+
+                    <p>
+                        Astra completely changed the way
+                        I edit my images. Everything I need
+                        is available in one place.
+                    </p>
+
+                    <h4>
+                        Sarah Johnson
+                    </h4>
+
+                    <span>
+                        Graphic Designer
+                    </span>
+
+                </div>
+
+
+                <div class="testimonial-card">
+
+                    <div class="stars">
+                        ★★★★★
+                    </div>
+
+                    <p>
+                        The photo editor is clean,
+                        modern and extremely easy to use.
+                    </p>
+
+                    <h4>
+                        Michael Lee
+                    </h4>
+
+                    <span>
+                        Business Consultant
+                    </span>
+
+                </div>
+
+
+                <div class="testimonial-card">
+
+                    <div class="stars">
+                        ★★★★★
+                    </div>
+
+                    <p>
+                        Astra combines powerful
+                        creative tools beautifully.
+                    </p>
+
+                    <h4>
+                        Emily Davis
+                    </h4>
+
+                    <span>
+                        UI Designer
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="cta-section">
+
+        <div class="container">
+
+            <h2>
+                Ready to Create Something Amazing?
+            </h2>
+
+            <p>
+                Join Astra today and start editing
+                photos for free.
+            </p>
+
+
+            <div class="hero-buttons">
+
+                <a
+                    href="auth.html"
+                    class="btn-primary">
+
+                    <i class="fa-solid fa-user-plus"></i>
+
+                    Create Free Account
+
+                </a>
+
+
+                <a
+                    href="workspace.html?mode=guest"
+                    class="btn-secondary">
+
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+                    Continue as Guest
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section
+        class="faq-section"
+        id="support">
+
+        <div class="container">
+
+            <div class="section-title">
+
+                <h2>
+                    Frequently Asked Questions
+                </h2>
+
+            </div>
+
+
+            <div class="faq-container">
+
+                <div class="faq-item">
+
+                    <h3>
+                        Is Astra free to use?
+                    </h3>
+
+                    <p>
+                        Yes. You can start with Guest Mode
+                        or create a free account.
+                    </p>
+
+                </div>
+
+
+                <div class="faq-item">
+
+                    <h3>
+                        Do I need to install anything?
+                    </h3>
+
+                    <p>
+                        No. Astra runs directly
+                        in your browser.
+                    </p>
+
+                </div>
+
+
+                <div class="faq-item">
+
+                    <h3>
+                        Can I edit generated images?
+                    </h3>
+
+                    <p>
+                        Yes. Generated images can be opened
+                        directly in the Astra Photo Editor.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
 <footer class="footer">
 
-    <div class="footer-content">
+    <div class="container footer-content">
 
-        <img
-            src="assets/logo/astra-logo.png"
-            alt="Astra Logo">
+        <a href="index.html">
+
+            <img
+                src="assets/logo/Astra-logo.png"
+                alt="Astra Logo">
+
+        </a>
+
 
         <p>
-
             Inspired by the Stars.
             Limitless Creativity.
-
         </p>
+
 
         <div class="footer-links">
 
-            <a href="#">Home</a>
-            <a href="#">Features</a>
-            <a href="#">Support</a>
-            <a href="#">Privacy</a>
+            <a href="index.html#home">
+                Home
+            </a>
+
+            <a href="index.html#features">
+                Features
+            </a>
+
+            <a href="index.html#support">
+                Support
+            </a>
+
+            <a href="#">
+                Privacy
+            </a>
 
         </div>
 
-        <p class="copyright">
 
+        <p class="copyright">
             © 2026 ASTRA.
             All Rights Reserved.
-
         </p>
 
     </div>
 
 </footer>
+```
+
 </body>
 
 </html>

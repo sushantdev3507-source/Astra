@@ -1,264 +1,564 @@
-// ===========================
-// ASTRA Templates
-// ===========================
-if(type==="custom"){
 
-const saved=JSON.parse(
+"use strict";
 
-localStorage.getItem(CUSTOM_TEMPLATE_KEY)
+(function () {
 
-)||[];
+    console.log("ASTRA: Template Tool Loading...");
 
-list.innerHTML="";
 
-saved.forEach(item=>{
+    
+    const templateTool =
+        document.getElementById("templatesTool");
 
-const card=document.createElement("div");
+    const templatePanel =
+        document.getElementById("templatePanel");
 
-card.className="template-card";
+    const closeTemplates =
+        document.getElementById("closeTemplates");
 
-card.innerHTML=`
+    const saveTemplateBtn =
+        document.getElementById("saveTemplateBtn");
 
-<img src="${item.thumbnail}">
+    const templateList =
+        document.getElementById("templateList");
 
-<h4>${item.name}</h4>
+    const templateStatus =
+        document.getElementById("templateStatus");
 
-`;
+    const categoryButtons =
+        document.querySelectorAll(
+            ".astra-template-category"
+        );
 
-card.onclick=()=>{
 
-canvas.loadFromJSON(
+    
 
-item.json,
+    function openTemplatePanel() {
 
-()=>{
+        if (!templatePanel) {
 
-canvas.renderAll();
+            console.error(
+                "ASTRA: #templatePanel not found."
+            );
 
-if(typeof refreshLayers==="function"){
+            return;
 
-refreshLayers();
+        }
 
-}
+        templatePanel.classList.add("active");
 
-}
+        console.log(
+            "ASTRA: Template Panel opened."
+        );
 
-);
+    }
 
-};
 
-list.appendChild(card);
+    
 
-});
+    function closeTemplatePanel() {
 
-return;
+        if (!templatePanel) return;
 
-}
-const CUSTOM_TEMPLATE_KEY="ASTRA_CUSTOM_TEMPLATES";
-const templates = {
+        templatePanel.classList.remove(
+            "active"
+        );
 
-instagram:[
+    }
 
-{
 
-name:"Instagram Post",
+    
+    if (templateTool) {
 
-image:"assets/templates/instagram.jpg",
+        templateTool.addEventListener(
+            "click",
+            function () {
 
-file:"templates/instagram.json"
+                openTemplatePanel();
 
-}
+            }
+        );
 
-],
+    } else {
 
-youtube:[
+        console.warn(
+            "ASTRA: #templatesTool not found."
+        );
 
-{
+    }
 
-name:"YouTube Thumbnail",
 
-image:"assets/templates/youtube.jpg",
+    
 
-file:"templates/youtube.json"
+    if (closeTemplates) {
 
-}
+        closeTemplates.addEventListener(
+            "click",
+            function () {
 
-],
+                closeTemplatePanel();
 
-facebook:[
+            }
+        );
 
-{
+    }
 
-name:"Facebook Post",
 
-image:"assets/templates/facebook.jpg",
+    
 
-file:"templates/facebook.json"
+    document.addEventListener(
+        "keydown",
+        function (event) {
 
-}
+            if (
+                event.key === "Escape"
+            ) {
 
-],
+                closeTemplatePanel();
 
-poster:[
+            }
 
-{
+        }
+    );
 
-name:"Poster",
 
-image:"assets/templates/poster.jpg",
+    
 
-file:"templates/poster.json"
+    categoryButtons.forEach(
+        function (button) {
 
-}
+            button.addEventListener(
+                "click",
+                function () {
 
-]
+                    categoryButtons.forEach(
+                        function (btn) {
 
-};
-const panel = document.getElementById("templatePanel");
+                            btn.classList.remove(
+                                "active"
+                            );
 
-document.getElementById("openTemplates").onclick = () => {
+                        }
+                    );
 
-    panel.classList.add("active");
 
-};
+                    button.classList.add(
+                        "active"
+                    );
 
-document.getElementById("closeTemplates").onclick = () => {
 
-    panel.classList.remove("active");
+                    const category =
+                        button.dataset.type;
 
-};
-const list = document.getElementById("templateList");
 
-document.querySelectorAll(".template-categories button")
+                    filterTemplates(
+                        category
+                    );
 
-.forEach(btn=>{
+                }
+            );
 
-btn.onclick=()=>{
+        }
+    );
 
-const type=btn.dataset.type;
 
-loadTemplates(type);
+    
 
-};
+    function filterTemplates(
+        category
+    ) {
 
-});
-function loadTemplates(type){
+        if (!templateList) return;
 
-list.innerHTML="";
 
-templates[type].forEach(item=>{
+        const cards =
+            templateList.querySelectorAll(
+                ".astra-template-card"
+            );
 
-const card=document.createElement("div");
 
-card.className="template-card";
+        cards.forEach(
+            function (card) {
 
-card.innerHTML=`
+                const type =
+                    card.dataset.template;
 
-<img src="${item.thumbnail}">
 
-<h4>${item.name}</h4>
+                if (
+                    category === "custom"
+                ) {
 
-<button class="delete-template">
+                    card.style.display =
+                        "flex";
 
-🗑 Delete
+                    return;
 
-</button>
+                }
 
-`;
 
-card.onclick=()=>{
+                if (
+                    type === category ||
+                    category === "instagram" ||
+                    category === "youtube" ||
+                    category === "facebook" ||
+                    category === "poster"
+                ) {
 
-loadTemplate(item.file);
+                    card.style.display =
+                        "flex";
 
-};
+                } else {
 
-list.appendChild(card);
+                    card.style.display =
+                        "none";
 
-});
+                }
 
-}
-async function loadTemplate(file){
+            }
+        );
 
-const response = await fetch(file);
+    }
 
-const json = await response.text();
 
-canvas.loadFromJSON(json,()=>{
+    
+    function getCanvas() {
 
-canvas.renderAll();
+        return (
+            window.canvas &&
+            typeof window.canvas.setWidth ===
+                "function"
+        )
+            ? window.canvas
+            : null;
 
-if(typeof refreshLayers==="function"){
+    }
 
-refreshLayers();
 
+    
+    function applyTemplate(
+        type
+    ) {
 
-}
+        const canvas =
+            getCanvas();
 
-});
 
-}
+        if (!canvas) {
 
-function saveCurrentTemplate(){
+            showStatus(
+                "Canvas is not ready yet.",
+                true
+            );
 
-const name=prompt("Template Name");
+            return;
 
-if(!name) return;
+        }
 
-const template={
 
-name:name,
+        let width =
+            1080;
 
-thumbnail:canvas.toDataURL({
+        let height =
+            1080;
 
-format:"png",
 
-quality:.5
+        switch (type) {
 
-}),
+            case "instagram":
 
-json:JSON.stringify(
+                width = 1080;
+                height = 1080;
 
-canvas.toJSON()
+                break;
 
-)
 
-};
+            case "facebook":
 
-const saved=JSON.parse(
+                width = 1200;
+                height = 630;
 
-localStorage.getItem(CUSTOM_TEMPLATE_KEY)
+                break;
 
-)||[];
 
-saved.push(template);
+            case "youtube":
 
-localStorage.setItem(
+                width = 1280;
+                height = 720;
 
-CUSTOM_TEMPLATE_KEY,
+                break;
 
-JSON.stringify(saved)
 
-);
+            case "poster":
 
-alert("Template Saved Successfully!");
+                width = 1080;
+                height = 1350;
 
-}
-document.getElementById("saveTemplateBtn").onclick=saveCurrentTemplate;
-custom:[]
-card.querySelector(".delete-template").onclick=(e)=>{
+                break;
 
-e.stopPropagation();
 
-saved.splice(index,1);
+            case "custom":
 
-localStorage.setItem(
+                width = 1000;
+                height = 650;
 
-CUSTOM_TEMPLATE_KEY,
+                break;
 
-JSON.stringify(saved)
 
-);
+            default:
 
-loadTemplates("custom");
+                width = 1000;
+                height = 650;
 
-};
+        }
+
+
+        
+        canvas.setWidth(
+            width
+        );
+
+        canvas.setHeight(
+            height
+        );
+
+
+        canvas.backgroundColor =
+            "#ffffff";
+
+
+        canvas.renderAll();
+
+
+        
+
+        if (
+            typeof window.fitCanvasToWorkspace ===
+                "function"
+        ) {
+
+            setTimeout(
+                function () {
+
+                    window.fitCanvasToWorkspace();
+
+                },
+                100
+            );
+
+        }
+
+
+        
+        showStatus(
+            "✓ " +
+            getTemplateName(type) +
+            " applied successfully."
+        );
+
+
+        console.log(
+            "ASTRA: Template applied:",
+            type,
+            width,
+            height
+        );
+
+
+        
+        if (
+            typeof window.saveHistory ===
+                "function"
+        ) {
+
+            try {
+
+                window.saveHistory();
+
+            } catch (error) {
+
+                console.warn(
+                    "ASTRA: History save failed.",
+                    error
+                );
+
+            }
+
+        }
+
+    }
+
+
+    
+    if (templateList) {
+
+        templateList.addEventListener(
+            "click",
+            function (event) {
+
+                const card =
+                    event.target.closest(
+                        ".astra-template-card"
+                    );
+
+
+                if (!card) return;
+
+
+                const type =
+                    card.dataset.template;
+
+
+                if (!type) return;
+
+
+                applyTemplate(
+                    type
+                );
+
+            }
+        );
+
+    }
+
+
+    
+
+    function getTemplateName(
+        type
+    ) {
+
+        const names = {
+
+            instagram:
+                "Instagram Post",
+
+            facebook:
+                "Facebook Post",
+
+            youtube:
+                "YouTube Thumbnail",
+
+            poster:
+                "Creative Poster",
+
+            custom:
+                "Custom Design"
+
+        };
+
+
+        return (
+            names[type] ||
+            "Template"
+        );
+
+    }
+
+
+    
+    function showStatus(
+        message,
+        error = false
+    ) {
+
+        if (!templateStatus) return;
+
+
+        templateStatus.innerHTML =
+            error
+                ? `
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    ${message}
+                  `
+                : `
+                    <i class="fa-solid fa-circle-check"></i>
+                    ${message}
+                  `;
+
+    }
+
+
+    
+
+    if (saveTemplateBtn) {
+
+        saveTemplateBtn.addEventListener(
+            "click",
+            function () {
+
+                const canvas =
+                    getCanvas();
+
+
+                if (!canvas) {
+
+                    showStatus(
+                        "Canvas is not ready.",
+                        true
+                    );
+
+                    return;
+
+                }
+
+
+                try {
+
+                    const data =
+                        JSON.stringify(
+                            canvas.toJSON()
+                        );
+
+
+                    localStorage.setItem(
+                        "ASTRA_SAVED_TEMPLATE",
+                        data
+                    );
+
+
+                    showStatus(
+                        "Current design saved successfully."
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "ASTRA: Template save failed.",
+                        error
+                    );
+
+
+                    showStatus(
+                        "Unable to save template.",
+                        true
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+
+    window.openAstraTemplates =
+        openTemplatePanel;
+
+
+    window.closeAstraTemplates =
+        closeTemplatePanel;
+
+
+    window.applyAstraTemplate =
+        applyTemplate;
+
+
+    
+
+    console.log(
+        "ASTRA: Template Tool READY."
+    );
+
+})();

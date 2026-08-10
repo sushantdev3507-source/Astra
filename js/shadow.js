@@ -1,119 +1,451 @@
-// ============================
-// ASTRA Shadow Tool
-// ============================
+const applyShadowBtn =
+    document.getElementById("applyShadow");
 
-const applyShadowBtn=document.getElementById("applyShadow");
+const removeShadowBtn =
+    document.getElementById("removeShadow");
 
-const removeShadowBtn=document.getElementById("removeShadow");
-applyShadowBtn.onclick=()=>{
+const shadowColor =
+    document.getElementById("shadowColor");
 
-const obj=canvas.getActiveObject();
+const shadowBlur =
+    document.getElementById("shadowBlur");
 
-if(!obj){
+const shadowOffsetX =
+    document.getElementById("shadowOffsetX");
 
-alert("Select an object first");
+const shadowOffsetY =
+    document.getElementById("shadowOffsetY");
 
-return;
+const enableShadow =
+    document.getElementById("enableShadow");
 
-}
-const shadow=new fabric.Shadow({
 
-color:
 
-document.getElementById("shadowColor").value,
+function isShadowCanvasReady() {
 
-blur:
-
-parseInt(
-
-document.getElementById("shadowBlur").value
-
-),
-
-offsetX:
-
-parseInt(
-
-document.getElementById("shadowOffsetX").value
-
-),
-
-offsetY:
-
-parseInt(
-
-document.getElementById("shadowOffsetY").value
-
-)
-
-});
-obj.set({
-
-shadow:shadow
-
-});
-
-canvas.renderAll();
-if(typeof saveState==="function"){
-
-saveState();
+    return (
+        typeof canvas !== "undefined" &&
+        canvas &&
+        typeof canvas.getActiveObject ===
+            "function"
+    );
 
 }
 
-if(typeof autoSaveProject==="function"){
 
-autoSaveProject();
 
-}
-removeShadowBtn.onclick=()=>{
+function saveShadowHistory() {
 
-const obj=canvas.getActiveObject();
+    
 
-if(!obj) return;
+    if (
+        typeof saveHistory ===
+        "function"
+    ) {
 
-obj.set({
+        saveHistory();
 
-shadow:null
+        return;
 
-});
+    }
 
-canvas.renderAll();
 
-};
-[
-"shadowColor",
-"shadowBlur",
-"shadowOffsetX",
-"shadowOffsetY"
+    
 
-].forEach(id=>{
+    if (
+        typeof saveState ===
+        "function"
+    ) {
 
-document.getElementById(id)
+        saveState();
 
-.addEventListener("input",()=>{
-
-if(document.getElementById("enableShadow").checked){
-
-applyShadowBtn.click();
+    }
 
 }
 
-});
 
-});
-document.getElementById("enableShadow")
 
-.onchange=function(){
+function autoSaveShadowProject() {
 
-if(this.checked){
+    if (
+        typeof autoSaveProject ===
+        "function"
+    ) {
 
-applyShadowBtn.click();
+        autoSaveProject();
 
-}else{
-
-removeShadowBtn.click();
+    }
 
 }
 
-};
+
+
+function getShadowSettings() {
+
+    const color =
+        shadowColor?.value ||
+        "#000000";
+
+
+    let blur =
+        Number(
+            shadowBlur?.value
+        );
+
+
+    let offsetX =
+        Number(
+            shadowOffsetX?.value
+        );
+
+
+    let offsetY =
+        Number(
+            shadowOffsetY?.value
+        );
+
+
+    
+
+    if (
+        !Number.isFinite(blur)
+    ) {
+
+        blur = 10;
+
+    }
+
+
+    if (
+        !Number.isFinite(offsetX)
+    ) {
+
+        offsetX = 5;
+
+    }
+
+
+    if (
+        !Number.isFinite(offsetY)
+    ) {
+
+        offsetY = 5;
+
+    }
+
+
+    
+
+    blur =
+        Math.max(
+            0,
+            blur
+        );
+
+
+    return {
+
+        color,
+
+        blur,
+
+        offsetX,
+
+        offsetY
+
+    };
+
 }
+
+
+
+function applyShadow() {
+
+    
+
+    if (
+        !isShadowCanvasReady()
+    ) {
+
+        console.error(
+            "ASTRA: Canvas is not ready."
+        );
+
+        return;
+
+    }
+
+
+    
+
+    if (
+        typeof fabric === "undefined" ||
+        !fabric.Shadow
+    ) {
+
+        console.error(
+            "ASTRA: Fabric.Shadow is not available."
+        );
+
+        return;
+
+    }
+
+
+    
+
+    const object =
+        canvas.getActiveObject();
+
+
+    if (!object) {
+
+        alert(
+            "Please select an object first."
+        );
+
+        return;
+
+    }
+
+
+    
+
+    const settings =
+        getShadowSettings();
+
+
+    
+
+    const shadow =
+        new fabric.Shadow({
+
+            color:
+                settings.color,
+
+            blur:
+                settings.blur,
+
+            offsetX:
+                settings.offsetX,
+
+            offsetY:
+                settings.offsetY
+
+        });
+
+
+    
+
+    object.set({
+
+        shadow:
+            shadow
+
+    });
+
+
+    object.setCoords();
+
+    canvas.requestRenderAll();
+
+
+    
+    saveShadowHistory();
+
+    autoSaveShadowProject();
+
+
+    console.log(
+        "ASTRA: Shadow applied successfully."
+    );
+
+}
+
+
+
+function removeShadow() {
+
+    if (
+        !isShadowCanvasReady()
+    ) {
+
+        return;
+
+    }
+
+
+    const object =
+        canvas.getActiveObject();
+
+
+    if (!object) {
+
+        return;
+
+    }
+
+
+    object.set({
+
+        shadow: null
+
+    });
+
+
+    object.setCoords();
+
+    canvas.requestRenderAll();
+
+
+    
+
+    saveShadowHistory();
+
+    autoSaveShadowProject();
+
+
+    console.log(
+        "ASTRA: Shadow removed successfully."
+    );
+
+}
+
+
+
+if (applyShadowBtn) {
+
+    applyShadowBtn.addEventListener(
+        "click",
+        applyShadow
+    );
+
+}
+
+
+
+if (removeShadowBtn) {
+
+    removeShadowBtn.addEventListener(
+        "click",
+        removeShadow
+    );
+
+}
+
+
+
+if (shadowColor) {
+
+    shadowColor.addEventListener(
+        "input",
+        () => {
+
+            if (
+                enableShadow &&
+                enableShadow.checked
+            ) {
+
+                applyShadow();
+
+            }
+
+        }
+    );
+
+}
+
+
+
+if (shadowBlur) {
+
+    shadowBlur.addEventListener(
+        "input",
+        () => {
+
+            if (
+                enableShadow &&
+                enableShadow.checked
+            ) {
+
+                applyShadow();
+
+            }
+
+        }
+    );
+
+}
+
+
+
+if (shadowOffsetX) {
+
+    shadowOffsetX.addEventListener(
+        "input",
+        () => {
+
+            if (
+                enableShadow &&
+                enableShadow.checked
+            ) {
+
+                applyShadow();
+
+            }
+
+        }
+    );
+
+}
+
+
+
+if (shadowOffsetY) {
+
+    shadowOffsetY.addEventListener(
+        "input",
+        () => {
+
+            if (
+                enableShadow &&
+                enableShadow.checked
+            ) {
+
+                applyShadow();
+
+            }
+
+        }
+    );
+
+}
+
+
+
+if (enableShadow) {
+
+    enableShadow.addEventListener(
+        "change",
+        function () {
+
+            if (this.checked) {
+
+                applyShadow();
+
+            } else {
+
+                removeShadow();
+
+            }
+
+        }
+    );
+
+}
+
+
+
+console.log(
+    "ASTRA: Shadow Tools Loaded Successfully."
+);

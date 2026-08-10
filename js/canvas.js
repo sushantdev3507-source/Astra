@@ -1,171 +1,389 @@
-// ===============================
-// ASTRA Canvas Manager
-// ===============================
 
-const canvas = new fabric.Canvas("editorCanvas", {
-    width: 1200,
-    height: 700,
-    backgroundColor: "#ffffff",
-    preserveObjectStacking: true,
-    selection: true
-});
+"use strict";
 
-// Canvas State
-const canvasState = {
-    zoom: 1,
-    gridVisible: false
-};
+(function () {
 
-// Render
-canvas.renderAll();
-canvas.on("mouse:wheel", function(opt){
+    
 
-    let delta = opt.e.deltaY;
+    if (window.ASTRA_CANVAS_INITIALIZED) {
 
-    let zoom = canvas.getZoom();
+        console.warn(
+            "ASTRA: Canvas is already initialized."
+        );
 
-    zoom *= 0.999 ** delta;
+        return;
+    }
 
-    if(zoom > 4) zoom = 4;
 
-    if(zoom < 0.2) zoom = 0.2;
+    
 
-    canvas.zoomToPoint(
-        {
-            x: opt.e.offsetX,
-            y: opt.e.offsetY
-        },
-        zoom
+    function initializeAstraCanvas() {
+
+        
+
+        if (
+            typeof fabric === "undefined"
+        ) {
+
+            console.error(
+                "ASTRA ERROR: Fabric.js is not loaded."
+            );
+
+            return false;
+        }
+
+
+        
+
+        if (
+            window.canvas &&
+            typeof window.canvas.add === "function"
+        ) {
+
+            console.log(
+                "ASTRA: Existing Fabric canvas detected."
+            );
+
+            window.ASTRA_CANVAS_INITIALIZED = true;
+
+            window.dispatchEvent(
+                new CustomEvent(
+                    "ASTRA_CANVAS_READY"
+                )
+            );
+
+            return true;
+        }
+
+
+        
+
+        const canvasElement =
+            document.getElementById(
+                "editorCanvas"
+            );
+
+
+        if (!canvasElement) {
+
+            console.error(
+                "ASTRA ERROR: #editorCanvas not found."
+            );
+
+            return false;
+        }
+
+
+        
+
+        try {
+
+            window.canvas =
+                new fabric.Canvas(
+                    canvasElement,
+                    {
+
+                        preserveObjectStacking:
+                            true,
+
+                        selection:
+                            true,
+
+                        backgroundColor:
+                            "#ffffff",
+
+                        uniformScaling:
+                            false,
+
+                        fireRightClick:
+                            true,
+
+                        stopContextMenu:
+                            true
+
+                    }
+                );
+
+
+        } catch (error) {
+
+            console.error(
+                "ASTRA ERROR: Failed to create Fabric canvas.",
+                error
+            );
+
+            return false;
+        }
+
+
+        
+
+        if (
+            !window.canvas ||
+            typeof window.canvas.add !== "function"
+        ) {
+
+            console.error(
+                "ASTRA ERROR: Fabric canvas creation failed."
+            );
+
+            return false;
+        }
+
+
+        
+        window.canvas.set({
+
+            selection:
+                true,
+
+            preserveObjectStacking:
+                true
+
+        });
+
+
+        
+
+        window.canvas.on(
+            "selection:created",
+            function () {
+
+                window.dispatchEvent(
+                    new CustomEvent(
+                        "ASTRA_OBJECT_SELECTED"
+                    )
+                );
+
+            }
+        );
+
+
+        window.canvas.on(
+            "selection:updated",
+            function () {
+
+                window.dispatchEvent(
+                    new CustomEvent(
+                        "ASTRA_OBJECT_SELECTED"
+                    )
+                );
+
+            }
+        );
+
+
+        window.canvas.on(
+            "selection:cleared",
+            function () {
+
+                window.dispatchEvent(
+                    new CustomEvent(
+                        "ASTRA_SELECTION_CLEARED"
+                    )
+                );
+
+            }
+        );
+
+
+        
+        window.canvas.on(
+            "object:modified",
+            function () {
+
+                if (
+                    typeof window.saveHistory ===
+                    "function"
+                ) {
+
+                    try {
+
+                        window.saveHistory();
+
+                    } catch (error) {
+
+                        console.warn(
+                            "ASTRA: History save failed.",
+                            error
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        
+        window.canvas.on(
+            "object:added",
+            function (event) {
+
+                const object =
+                    event.target;
+
+
+                if (object) {
+
+                    object.set({
+                        selectable: true,
+                        evented: true
+                    });
+
+                }
+
+
+                window.dispatchEvent(
+                    new CustomEvent(
+                        "ASTRA_OBJECT_ADDED",
+                        {
+                            detail: {
+                                object: object
+                            }
+                        }
+                    )
+                );
+
+            }
+        );
+
+
+        
+
+        window.canvas.on(
+            "object:removed",
+            function (event) {
+
+                window.dispatchEvent(
+                    new CustomEvent(
+                        "ASTRA_OBJECT_REMOVED",
+                        {
+                            detail: {
+                                object:
+                                    event.target
+                            }
+                        }
+                    )
+                );
+
+            }
+        );
+
+
+        
+        window.canvas.requestRenderAll();
+
+
+        
+
+        window.ASTRA_CANVAS_INITIALIZED =
+            true;
+
+
+        console.log(
+            "ASTRA: Fabric canvas initialized successfully."
+        );
+
+
+        
+
+        window.dispatchEvent(
+            new CustomEvent(
+                "ASTRA_CANVAS_READY"
+            )
+        );
+
+
+        return true;
+
+    }
+
+
+    
+
+    function startCanvasInitialization() {
+
+        if (
+            window.ASTRA_CANVAS_INITIALIZED
+        ) {
+
+            return;
+        }
+
+
+        initializeAstraCanvas();
+
+    }
+
+
+    
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            startCanvasInitialization,
+            {
+                once: true
+            }
+        );
+
+    } else {
+
+        startCanvasInitialization();
+
+    }
+
+
+    
+
+    window.getAstraCanvas =
+        function () {
+
+            if (
+                window.canvas &&
+                typeof window.canvas.add ===
+                    "function"
+            ) {
+
+                return window.canvas;
+
+            }
+
+            return null;
+
+        };
+
+
+    
+
+    window.isAstraCanvasReady =
+        function () {
+
+            return !!(
+                window.canvas &&
+                typeof window.canvas.add ===
+                    "function"
+            );
+
+        };
+
+
+    
+
+    window.initializeAstraCanvas =
+        initializeAstraCanvas;
+
+
+    
+
+    console.log(
+        "ASTRA: canvas.js loaded successfully."
     );
 
-    canvasState.zoom = zoom;
-
-    opt.e.preventDefault();
-    opt.e.stopPropagation();
-
-});
-const zoomValue=document.getElementById("zoomValue");
-
-document.getElementById("zoomInBtn").onclick=()=>{
-
-    canvasState.zoom+=0.1;
-
-    canvas.setZoom(canvasState.zoom);
-
-    zoomValue.innerHTML=Math.round(canvasState.zoom*100)+"%";
-
-};
-
-document.getElementById("zoomOutBtn").onclick=()=>{
-
-    canvasState.zoom-=0.1;
-
-    if(canvasState.zoom<0.2){
-
-        canvasState.zoom=0.2;
-
-    }
-
-    canvas.setZoom(canvasState.zoom);
-
-    zoomValue.innerHTML=Math.round(canvasState.zoom*100)+"%";
-
-};
-function resizeCanvas(){
-
-    const workspace=document.querySelector(".workspace");
-
-    canvas.setDimensions({
-
-        width:workspace.clientWidth-80,
-
-        height:workspace.clientHeight-80
-
-    });
-
-    canvas.renderAll();
-
-}
-
-window.addEventListener("resize",resizeCanvas);
-
-resizeCanvas();
-document.getElementById("toggleGrid").onclick=()=>{
-
-    canvasState.gridVisible=!canvasState.gridVisible;
-
-    canvas.backgroundColor=
-
-        canvasState.gridVisible
-
-        ? "#f8fafc"
-
-        : "#ffffff";
-
-    canvas.renderAll();
-
-};
-let isPanning=false;
-
-document.addEventListener("keydown",(e)=>{
-
-    if(e.code==="Space"){
-
-        isPanning=true;
-
-        canvas.defaultCursor="grab";
-
-    }
-
-});
-
-document.addEventListener("keyup",()=>{
-
-    isPanning=false;
-
-    canvas.defaultCursor="default";
-
-});
-
-canvas.on("mouse:down",(opt)=>{
-
-    if(!isPanning)return;
-
-    canvas.isDragging=true;
-
-    canvas.lastPosX=opt.e.clientX;
-
-    canvas.lastPosY=opt.e.clientY;
-
-});
-
-canvas.on("mouse:move",(opt)=>{
-
-    if(!canvas.isDragging)return;
-
-    const e=opt.e;
-
-    const vpt=canvas.viewportTransform;
-
-    vpt[4]+=e.clientX-canvas.lastPosX;
-
-    vpt[5]+=e.clientY-canvas.lastPosY;
-
-    canvas.requestRenderAll();
-
-    canvas.lastPosX=e.clientX;
-
-    canvas.lastPosY=e.clientY;
-
-});
-
-canvas.on("mouse:up",()=>{
-
-    canvas.isDragging=false;
-
-});
-window.addEventListener("load",()=>{
-
-    saveHistory();
-
-});
+})();

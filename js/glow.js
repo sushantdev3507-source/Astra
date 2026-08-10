@@ -1,105 +1,323 @@
-// =========================
-// ASTRA Glow Tool
-// =========================
 
-const glowBtn=document.getElementById("applyGlow");
 
-const removeGlowBtn=document.getElementById("removeGlow");
-glowBtn.onclick=()=>{
+const glowBtn =
+    document.getElementById("applyGlow");
 
-const obj=canvas.getActiveObject();
+const removeGlowBtn =
+    document.getElementById("removeGlow");
 
-if(!obj){
+const glowColor =
+    document.getElementById("glowColor");
 
-alert("Select any object");
+const glowBlur =
+    document.getElementById("glowBlur");
 
-return;
+const enableGlow =
+    document.getElementById("enableGlow");
 
-}
-const glow=new fabric.Shadow({
 
-color:
 
-document.getElementById("glowColor").value,
 
-blur:
+function isGlowCanvasReady() {
 
-parseInt(
-
-document.getElementById("glowBlur").value
-
-),
-
-offsetX:0,
-
-offsetY:0
-
-});
-obj.set({
-
-shadow:glow
-
-});
-
-canvas.renderAll();
-if(typeof saveState==="function"){
-
-saveState();
+    return (
+        typeof canvas !== "undefined" &&
+        canvas &&
+        typeof canvas.getActiveObject ===
+            "function"
+    );
 
 }
 
-if(typeof autoSaveProject==="function"){
 
-autoSaveProject();
 
-}
-removeGlowBtn.onclick=()=>{
 
-const obj=canvas.getActiveObject();
+function saveGlowHistory() {
 
-if(!obj) return;
+    if (
+        typeof saveHistory ===
+        "function"
+    ) {
 
-obj.set({
+        saveHistory();
 
-shadow:null
+        return;
 
-});
+    }
 
-canvas.renderAll();
+    if (
+        typeof saveState ===
+        "function"
+    ) {
 
-};
-[
-"glowColor",
-"glowBlur"
+        saveState();
 
-].forEach(id=>{
-
-document.getElementById(id)
-
-.addEventListener("input",()=>{
-
-if(document.getElementById("enableGlow").checked){
-
-glowBtn.click();
+    }
 
 }
 
-});
 
-});
-document.getElementById("enableGlow")
 
-.onchange=function(){
 
-if(this.checked){
+function autoSaveGlowProject() {
 
-glowBtn.click();
+    if (
+        typeof autoSaveProject ===
+        "function"
+    ) {
 
-}else{
+        autoSaveProject();
 
-removeGlowBtn.click();
+    }
 
 }
 
-};
+
+
+
+function getGlowSettings() {
+
+    const color =
+        glowColor?.value ||
+        "#000000";
+
+    let blur =
+        Number(
+            glowBlur?.value
+        );
+
+    if (
+        !Number.isFinite(blur)
+    ) {
+
+        blur = 20;
+
+    }
+
+    blur =
+        Math.max(
+            0,
+            blur
+        );
+
+    return {
+
+        color,
+        blur
+
+    };
+
 }
+
+
+
+
+function createGlow() {
+
+    if (!isGlowCanvasReady()) {
+
+        console.error(
+            "ASTRA: Canvas is not available."
+        );
+
+        return;
+
+    }
+
+    if (
+        typeof fabric === "undefined" ||
+        !fabric.Shadow
+    ) {
+
+        console.error(
+            "ASTRA: Fabric.Shadow is not available."
+        );
+
+        return;
+
+    }
+
+    const object =
+        canvas.getActiveObject();
+
+    if (!object) {
+
+        alert(
+            "Please select an object first."
+        );
+
+        return;
+
+    }
+
+    const settings =
+        getGlowSettings();
+
+    const glow =
+        new fabric.Shadow({
+
+            color:
+                settings.color,
+
+            blur:
+                settings.blur,
+
+            offsetX: 0,
+
+            offsetY: 0
+
+        });
+
+    object.set({
+        shadow: glow
+    });
+
+    object.setCoords();
+
+    canvas.requestRenderAll();
+
+    saveGlowHistory();
+
+    autoSaveGlowProject();
+
+    console.log(
+        "ASTRA: Glow applied successfully."
+    );
+
+}
+
+
+
+
+function removeGlow() {
+
+    if (!isGlowCanvasReady()) {
+
+        return;
+
+    }
+
+    const object =
+        canvas.getActiveObject();
+
+    if (!object) {
+
+        return;
+
+    }
+
+    object.set({
+        shadow: null
+    });
+
+    object.setCoords();
+
+    canvas.requestRenderAll();
+
+    saveGlowHistory();
+
+    autoSaveGlowProject();
+
+    console.log(
+        "ASTRA: Glow removed successfully."
+    );
+
+}
+
+
+if (glowBtn) {
+
+    glowBtn.addEventListener(
+        "click",
+        createGlow
+    );
+
+}
+
+
+
+if (removeGlowBtn) {
+
+    removeGlowBtn.addEventListener(
+        "click",
+        removeGlow
+    );
+
+}
+
+
+
+
+if (glowColor) {
+
+    glowColor.addEventListener(
+        "input",
+        () => {
+
+            if (
+                enableGlow &&
+                enableGlow.checked
+            ) {
+
+                createGlow();
+
+            }
+
+        }
+    );
+
+}
+
+
+
+
+if (glowBlur) {
+
+    glowBlur.addEventListener(
+        "input",
+        () => {
+
+            if (
+                enableGlow &&
+                enableGlow.checked
+            ) {
+
+                createGlow();
+
+            }
+
+        }
+    );
+
+}
+
+
+
+if (enableGlow) {
+
+    enableGlow.addEventListener(
+        "change",
+        function () {
+
+            if (this.checked) {
+
+                createGlow();
+
+            } else {
+
+                removeGlow();
+
+            }
+
+        }
+    );
+
+}
+
+
+
+
+console.log(
+    "ASTRA: Glow Tools Loaded Successfully."
+);
+
