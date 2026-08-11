@@ -1,0 +1,8 @@
+{
+  "name": "@astra/html-tool",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Standalone HTML5 Canvas image-editing engine for Astra. No framework dependencies.",
+  "main": "src/engine.ts",
+  "types": "src/engine.ts"
+}

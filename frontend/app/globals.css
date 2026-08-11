@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* AI generation visualizer (Sprint 4 Track B §21) -- an indeterminate
+   sweep, never a fake percentage, since real inference progress isn't
+   available from the backend. */
+@keyframes astra-ai-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.astra-ai-shimmer {
+  background: linear-gradient(
+    100deg,
+    rgba(99, 102, 241, 0) 30%,
+    rgba(99, 102, 241, 0.35) 45%,
+    rgba(56, 189, 248, 0.45) 50%,
+    rgba(99, 102, 241, 0.35) 55%,
+    rgba(99, 102, 241, 0) 70%
+  );
+  background-size: 250% 100%;
+  animation: astra-ai-shimmer 1.8s ease-in-out infinite;
+}
