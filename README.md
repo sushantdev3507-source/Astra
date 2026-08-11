@@ -1,2 +1,1 @@
-# Astra
-A tool for photo editor
+ASTRA Photo Editor
