@@ -1,0 +1,31 @@
+# Node
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/dev.log
+frontend/npm-debug.log*
+
+# Python
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.pyc
+backend/.pytest_cache/
+backend/server.log
+
+# Storage (uploaded assets - temporary, never committed)
+backend/storage/
+
+# Env files (never commit secrets)
+.env
+.env.local
+*.env
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
