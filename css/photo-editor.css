@@ -171,3 +171,17 @@ body {
         padding: 8px;
     }
 }
+#saveBtn,
+#saveProject {
+    display: none !important;
+}
+.properties.closed {
+    display: none !important;
+}
+.editor-shell:has(.properties.closed) {
+    grid-template-columns: 88px minmax(0, 1fr) 0;
+}
+
+.editor-shell:has(.properties.closed) .workspace {
+    width: 100%;
+}

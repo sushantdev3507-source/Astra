@@ -1,1 +1,18 @@
 ASTRA.setTool=(tool)=>{ASTRA.state.tool=tool;if(ASTRA.state.canvas&&tool!=='brush')ASTRA.state.canvas.isDrawingMode=false;if(tool!=='eyedropper')ASTRA.state.eyedropper=false;document.querySelectorAll('.tool-btn').forEach(b=>b.classList.toggle('active',b.dataset.tool===tool));document.querySelectorAll('.contextual').forEach(s=>s.classList.add('hidden'));if(tool&&tool!=='select')document.querySelector(`.contextual[data-panel="${tool}"]`)?.classList.remove('hidden');const p=document.getElementById('propertiesPanel');if(window.innerWidth<=820&&tool&&tool!=='select')p.classList.add('open');const title=document.getElementById('propertiesTitle');const subtitle=document.getElementById('propertiesSubtitle');const names={image:'Image',text:'Text',shapes:'Shapes',gradient:'Gradient',shadow:'Shadow',glow:'Glow',filters:'Filters',brush:'Brush',pen:'Pen',crop:'Crop',frame:'Frame',eyedropper:'Color Picker',templates:'Templates',pages:'Pages',ai:'AI Tools',select:'Properties'};if(title)title.textContent=names[tool]||'Properties';if(subtitle)subtitle.textContent=tool&&tool!=='select'?'Tool settings':'Select an object or tool'};
+document.addEventListener("DOMContentLoaded", function () {
+    const propertiesPanel = document.getElementById("propertiesPanel");
+    const clearProperties = document.getElementById("clearProperties");
+
+    if (!propertiesPanel || !clearProperties) return;
+
+    clearProperties.addEventListener("click", function () {
+        propertiesPanel.classList.add("closed");
+        propertiesPanel.classList.remove("open");
+    });
+
+    document.querySelectorAll("[data-tool]").forEach(function (button) {
+        button.addEventListener("click", function () {
+            propertiesPanel.classList.remove("closed");
+        });
+    });
+});
