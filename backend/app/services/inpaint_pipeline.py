@@ -50,7 +50,7 @@ def validate_inpaint_request(prompt: str, feather_radius: Optional[int]) -> tupl
 
 
 async def run_inpaint_pipeline(
-    image_bytes: bytes, mask_bytes: bytes, prompt: str, feather_radius: int
+    image_bytes: bytes, mask_bytes: Optional[bytes], prompt: str, feather_radius: int
 ) -> InpaintPipelineResult:
     """
     Runs the full pipeline against ALREADY-VALIDATED prompt/feather_radius
@@ -59,6 +59,13 @@ async def run_inpaint_pipeline(
     feedback on a bad prompt rather than waiting for a queued job to
     fail). Image/mask bytes are still validated here since they're the
     expensive/binary part appropriate for the background path.
+
+    mask_bytes is None for an instruction-only edit (no region painted)
+    -- validation/feathering is skipped entirely in that case and the
+    provider receives None, exactly as it would for a real "just do
+    what I asked" request. Not every provider supports this (see
+    real_provider.py); that's a provider-level decision, not enforced
+    here.
     """
     if len(image_bytes) == 0:
         raise InpaintPipelineError("Image is empty.")
@@ -71,13 +78,14 @@ async def run_inpaint_pipeline(
     if width is None or height is None:
         raise InpaintPipelineError("Could not determine image dimensions.")
 
-    try:
-        mask_image = load_and_validate_mask(mask_bytes, expected_size=(width, height))
-    except MaskValidationError as exc:
-        raise InpaintPipelineError(str(exc)) from exc
-
-    feathered_mask = feather_mask(mask_image, feather_radius)
-    feathered_mask_bytes = mask_to_png_bytes(feathered_mask)
+    feathered_mask_bytes: Optional[bytes] = None
+    if mask_bytes is not None:
+        try:
+            mask_image = load_and_validate_mask(mask_bytes, expected_size=(width, height))
+        except MaskValidationError as exc:
+            raise InpaintPipelineError(str(exc)) from exc
+        feathered_mask = feather_mask(mask_image, feather_radius)
+        feathered_mask_bytes = mask_to_png_bytes(feathered_mask)
 
     try:
         provider = get_inpainting_provider()

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   MousePointer2,
   Paintbrush,
@@ -9,6 +9,7 @@ import {
   Shapes,
   Crop as CropIcon,
   Sparkles,
+  Pipette,
 } from "lucide-react";
 import { useEditor } from "@/lib/editor/EditorProvider";
 import { useCanvasEngine } from "@/lib/editor/EngineContext";
@@ -32,6 +33,7 @@ const TOOL_ICONS: Record<ToolId, typeof MousePointer2> = {
   text: Type,
   shape: Shapes,
   crop: CropIcon,
+  eyedropper: Pipette,
   "ai-edit": Sparkles,
 };
 
@@ -42,6 +44,7 @@ const TOOL_SHORTCUTS: Record<ToolId, string> = {
   text: "T",
   shape: "S",
   crop: "C",
+  eyedropper: "I",
   "ai-edit": "M",
 };
 
@@ -55,8 +58,10 @@ export function Toolbar() {
 
   const [brushColor, setBrushColor] = useState("#f97316");
   const [brushSize, setBrushSize] = useState(8);
+  const [brushOpacity, setBrushOpacity] = useState(1);
   const [shapeKind, setShapeKind] = useState<ShapeKind>("rect");
   const [shapeFill, setShapeFill] = useState("#6366f1");
+  const [textPreset, setTextPresetState] = useState<"heading" | "paragraph">("heading");
   const [aiMaskMode, setAiMaskModeState] = useState<"paint" | "erase">("paint");
   const [aiMaskBrushSize, setAiMaskBrushSizeState] = useState(40);
   const [aiPrompt, setAiPrompt] = useState("");
@@ -68,16 +73,22 @@ export function Toolbar() {
     if (id !== "ai-edit") aiEdit.reset();
   }
 
-  function applyBrush(color: string, size: number) {
+  function applyBrush(color: string, size: number, opacity: number = brushOpacity) {
     setBrushColor(color);
     setBrushSize(size);
-    engineRef.current?.setBrushOptions({ color, size });
+    setBrushOpacity(opacity);
+    engineRef.current?.setBrushOptions({ color, size, opacity });
   }
 
   function applyShapeStyle(kind: ShapeKind, fill: string) {
     setShapeKind(kind);
     setShapeFill(fill);
     engineRef.current?.setShapeStyle({ shapeKind: kind, fill, stroke: fill, strokeWidth: 2 });
+  }
+
+  function applyTextPreset(preset: "heading" | "paragraph") {
+    setTextPresetState(preset);
+    engineRef.current?.setTextPreset(preset);
   }
 
   function applyAiMaskMode(mode: "paint" | "erase") {
@@ -89,6 +100,32 @@ export function Toolbar() {
     setAiMaskBrushSizeState(size);
     engineRef.current?.setAiMaskBrushSize(size);
   }
+
+  // Eyedropper picks (Toolbar's UI has no separate "which field" step --
+  // apply to both brush and shape fill, so whichever the user reaches
+  // for next already has it). Tracked via a comparison STATE value
+  // (not a ref -- this project's lint config disallows ref reads
+  // during render) updated during render itself, React's documented
+  // pattern for "adjust state when an external value changes" without
+  // an effect. The effect below is reserved for the imperative engine
+  // calls only.
+  const [lastProcessedPick, setLastProcessedPick] = useState<string | null>(null);
+  if (state.lastPickedColor && state.lastPickedColor !== lastProcessedPick) {
+    setLastProcessedPick(state.lastPickedColor);
+    setBrushColor(state.lastPickedColor);
+    setShapeFill(state.lastPickedColor);
+  }
+  useEffect(() => {
+    if (!state.lastPickedColor) return;
+    engineRef.current?.setBrushOptions({ color: state.lastPickedColor, size: brushSize });
+    engineRef.current?.setShapeStyle({
+      shapeKind,
+      fill: state.lastPickedColor,
+      stroke: state.lastPickedColor,
+      strokeWidth: 2,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.lastPickedColor]);
 
   const isGenerateBusy = [
     "preparing",
@@ -169,6 +206,47 @@ export function Toolbar() {
               className="accent-[#6366F1]"
             />
           </label>
+          <label className={`flex flex-col gap-1 text-xs ${INACTIVE_TEXT}`}>
+            Opacity: {Math.round(brushOpacity * 100)}%
+            <input
+              type="range"
+              min={0.05}
+              max={1}
+              step={0.05}
+              value={brushOpacity}
+              onChange={(e) => applyBrush(brushColor, brushSize, Number(e.target.value))}
+              className="accent-[#6366F1]"
+            />
+          </label>
+        </div>
+      )}
+
+      {state.activeTool === "text" && (
+        <div className="mt-2 flex flex-col gap-2 rounded-lg border border-slate-700/50 bg-slate-900/60 p-2.5">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Text style</p>
+          <p className={`text-[11px] ${INACTIVE_TEXT}`}>Choose a style, then click the canvas to place it.</p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => applyTextPreset("heading")}
+              className={[
+                "flex-1 rounded px-2 py-1.5 text-xs font-medium transition",
+                textPreset === "heading" ? "bg-[#6366F1] text-white" : `border border-slate-700 ${INACTIVE_TEXT}`,
+              ].join(" ")}
+            >
+              Heading
+            </button>
+            <button
+              type="button"
+              onClick={() => applyTextPreset("paragraph")}
+              className={[
+                "flex-1 rounded px-2 py-1.5 text-xs font-medium transition",
+                textPreset === "paragraph" ? "bg-[#6366F1] text-white" : `border border-slate-700 ${INACTIVE_TEXT}`,
+              ].join(" ")}
+            >
+              Paragraph
+            </button>
+          </div>
         </div>
       )}
 
@@ -233,7 +311,12 @@ export function Toolbar() {
       {state.activeTool === "ai-edit" && (
         <div className="mt-2 flex flex-col gap-3 rounded-lg border border-[#6366F1]/40 bg-[#6366F1]/[0.07] p-2.5">
           <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-[#38BDF8]">
-            <Sparkles size={12} /> AI Edit — Mask
+            <Sparkles size={12} /> AI Edit
+          </p>
+          <p className={`-mt-1 text-[11px] leading-snug ${INACTIVE_TEXT}`}>
+            Painting a region below is optional. Describe the edit in the
+            prompt and Astra will apply it to the whole image if nothing
+            is painted, or just the painted region if it is.
           </p>
 
           <div className="flex gap-2">
@@ -298,7 +381,7 @@ export function Toolbar() {
               onChange={(e) => setAiPrompt(e.target.value)}
               rows={3}
               maxLength={500}
-              placeholder="Describe the edit for the masked region…"
+              placeholder="e.g. Remove the man behind the two people in front…"
               className="resize-none rounded border border-slate-700 bg-slate-900 px-2 py-1 text-xs text-slate-200"
             />
           </label>

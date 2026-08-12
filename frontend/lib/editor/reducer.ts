@@ -29,6 +29,7 @@ export type EditorAction =
    */
   | { type: "canvas/init"; snapshot: CanvasSnapshot }
   | { type: "session/consumeRestore" }
+  | { type: "color/picked"; hex: string }
   | { type: "history/undo" }
   | { type: "history/redo" }
   // --- Multi-page (Sprint 5 foundation) ---
@@ -133,6 +134,9 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
 
     case "session/consumeRestore":
       return { ...state, pendingRestoreDocument: null };
+
+    case "color/picked":
+      return { ...state, lastPickedColor: action.hex, activeTool: "select" };
 
     case "asset/clear":
       return {

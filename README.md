@@ -1,13 +1,20 @@
-# Astra — Sprint 4
+# Astra — Sprint 4 + Gemini AI Edit Integration
 
-Astra is the web-based asset editing tool for **5onam.ai**. Sprint 1 built the
+Astra is the web-based asset editing tool for **Sonal.ai**. Sprint 1 built the
 full-stack foundation. Sprint 2 added a real HTML5 Canvas editing engine.
 Sprint 3 added AI Edit (mock provider), session recovery, and layers.
-**Sprint 4 adds a real AI provider adapter (Replicate/FLUX.1 Fill — not yet
-live-verified, no credentials available), an async job architecture
-(Celery + Redis, with a synchronous dev-mode fallback), a modernized UI
-(icon toolbar, keyboard shortcuts, AI generation visualizer), and
-in-flight-job session recovery.**
+Sprint 4 added a Replicate/FLUX.1 Fill provider adapter, an async job
+architecture (Celery + Redis), and a modernized UI. Sprint 5 added a
+multi-page document foundation. **The most recent round integrates Google
+Gemini (gemini-3.1-flash-image) as a real AI Edit provider, and makes mask
+painting fully optional — a user can now type a natural-language
+instruction like "remove the man behind the two people" with no painted
+region at all.**
+
+See `GEMINI_INTEGRATION.md` for the full report on that integration
+(API contract, request/response flow, error handling, known limitations —
+including that live Gemini inference is not yet verified, no credentials
+are available in this environment).
 
 See `SPRINT4_REPORT.md` for the full Sprint 4 report (provider setup, job
 architecture, exact run commands, known limitations, Sprint 5
@@ -46,11 +53,11 @@ here and how to run it.
 - **Session recovery** — edits autosave to IndexedDB; reopening the editor
   offers to restore your last session
 
-**5onam.ai integration readiness:**
+**Sonal.ai integration readiness:**
 - `/editor?assetId=<id>` or `/editor?assetUrl=<url>&assetType=image` — Astra
   can be launched with an external asset reference instead of a local upload
-- `/dev/launch-astra` — a dev-only page that simulates "5onam.ai launches
-  Astra", for exercising that path without a real 5onam.ai integration
+- `/dev/launch-astra` — a dev-only page that simulates "Sonal.ai launches
+  Astra", for exercising that path without a real Sonal.ai integration
 - `AstraLaunchContext` / `AstraEditResult` — typed contracts for the launch
   and save/return flows (see `frontend/lib/integration/`)
 - `/api/v1/...` API versioning, with `/api/...` kept working for
@@ -62,7 +69,7 @@ here and how to run it.
 - PDF / PPTX editing
 - Authentication, user accounts, database, cloud storage
 - Real-time collaboration
-- A real 5onam.ai production API integration (only the local
+- A real Sonal.ai production API integration (only the local
   interfaces/contracts + mock dev flow exist, intentionally)
 
 ---
@@ -70,7 +77,7 @@ here and how to run it.
 ## Architecture
 
 ```text
-5onam.ai (future)
+Sonal.ai (future)
    │  launches with ?assetId=... or ?assetUrl=...
    ▼
 Astra Frontend (Next.js, :3000)
@@ -119,7 +126,7 @@ astra/
 │   ├── app/
 │   │   ├── page.tsx            # Landing page
 │   │   ├── editor/page.tsx     # /editor — reads launch query params
-│   │   └── dev/launch-astra/   # Dev-only mock 5onam.ai launch page
+│   │   └── dev/launch-astra/   # Dev-only mock Sonal.ai launch page
 │   ├── components/editor/      # Header, Toolbar, Canvas, PropertiesPanel, StatusBar
 │   ├── lib/
 │   │   ├── api/                 # client.ts, assets.ts, health.ts

@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import base64
 import time
+from typing import Optional
 
 import httpx
 
@@ -62,7 +63,18 @@ class RealGenerativeAIProvider(InpaintingProvider):
         self._model = settings.replicate_model_version
         self._timeout = settings.real_provider_timeout_seconds
 
-    async def inpaint(self, image_bytes: bytes, mask_bytes: bytes, prompt: str) -> InpaintResult:
+    async def inpaint(self, image_bytes: bytes, mask_bytes: Optional[bytes], prompt: str) -> InpaintResult:
+        if mask_bytes is None:
+            # FLUX.1 Fill (and traditional inpainting models generally)
+            # are architecturally mask-based -- there is no "just edit
+            # based on the instruction" mode to fall back to here. This
+            # is an honest limitation, not something to fake around;
+            # Gemini (see gemini_provider.py) is the provider to use
+            # for maskless, instruction-only edits.
+            raise InpaintingProviderError(
+                "This provider requires a painted mask region. Paint a mask first, "
+                "or switch to the Gemini provider for instruction-only edits without a mask."
+            )
         start = time.monotonic()
         headers = {
             "Authorization": f"Bearer {self._token}",

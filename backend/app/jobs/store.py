@@ -71,12 +71,12 @@ def is_async_mode() -> bool:
     return USE_CELERY
 
 
-async def submit_job(image_bytes: bytes, mask_bytes: bytes, prompt: str, feather_radius: int) -> str:
+async def submit_job(image_bytes: bytes, mask_bytes: Optional[bytes], prompt: str, feather_radius: int) -> str:
     if USE_CELERY:
         from app.jobs.tasks import run_inpaint_task
 
         image_b64 = base64.b64encode(image_bytes).decode("ascii")
-        mask_b64 = base64.b64encode(mask_bytes).decode("ascii")
+        mask_b64 = base64.b64encode(mask_bytes).decode("ascii") if mask_bytes is not None else None
         async_result = run_inpaint_task.delay(image_b64, mask_b64, prompt, feather_radius)
         return async_result.id
 

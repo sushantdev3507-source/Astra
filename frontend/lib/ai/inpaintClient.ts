@@ -24,9 +24,10 @@ export interface JobStatusResponse {
 }
 
 export interface AiProviderStatus {
-  provider: "mock" | "real";
+  provider: "mock" | "real" | "gemini";
   configured: boolean;
   model?: string | null;
+  supportsMaskless?: boolean;
 }
 
 /** Fine-grained progress states surfaced to the UI (Sprint 4 Track B). */
@@ -36,7 +37,7 @@ const POLL_INTERVAL_MS = 700;
 const MAX_POLL_MS = 150000; // generous -- real models can be slow; matches backend's own timeout + margin
 
 /**
- * Calls Astra's own async AI job API -- NOT a 5onam.ai or third-party
+ * Calls Astra's own async AI job API -- NOT a Sonal.ai or third-party
  * AI endpoint. Creates a job (POST /api/v1/inpaint -> 202 + job_id),
  * then polls GET /api/v1/jobs/{job_id} until it reaches a terminal
  * state, reporting progress via onProgress along the way. See
@@ -44,7 +45,7 @@ const MAX_POLL_MS = 150000; // generous -- real models can be slow; matches back
  */
 export async function requestInpaint(
   imageBlob: Blob,
-  maskBlob: Blob,
+  maskBlob: Blob | null,
   prompt: string,
   featherRadius?: number,
   onProgress?: (stage: InpaintProgress) => void,
@@ -54,7 +55,11 @@ export async function requestInpaint(
 
   const formData = new FormData();
   formData.append("image", imageBlob, "image.png");
-  formData.append("mask", maskBlob, "mask.png");
+  // mask is OPTIONAL (Gemini Integration Sprint) -- omitted entirely
+  // for an instruction-only edit with no painted region.
+  if (maskBlob) {
+    formData.append("mask", maskBlob, "mask.png");
+  }
   formData.append("prompt", prompt);
   if (featherRadius !== undefined) {
     formData.append("feather_radius", String(featherRadius));

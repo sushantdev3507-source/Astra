@@ -70,11 +70,15 @@ export function useAiEdit(): UseAiEditReturn {
         setError("Enter a prompt describing the edit.");
         return false;
       }
-      if (!engine.hasAiMaskContent()) {
-        setStatus("error");
-        setError("Paint a mask over the region you want to edit first.");
-        return false;
-      }
+      // Mask is now OPTIONAL (Gemini Integration Sprint) -- a user can
+      // give an instruction with no painted region ("remove the man
+      // behind the two people") and providers that support
+      // instruction-only editing (Gemini, the mock) will attempt it
+      // using image+prompt alone. Providers that architecturally
+      // require a mask (traditional inpainting models) reject a
+      // maskless request with a clear error from the backend itself --
+      // deciding that here would require an extra round-trip and
+      // duplicate the backend's own source-of-truth logic.
 
       generationIdRef.current += 1;
       const thisGenerationId = generationIdRef.current;
@@ -87,11 +91,12 @@ export function useAiEdit(): UseAiEditReturn {
       try {
         // Fresh export EVERY call -- never reused/cached across
         // generations, so this always reflects the CURRENT mask
-        // (region B, not region A) and the CURRENT image (including
-        // any prior AI result already applied).
+        // (region B, not region A, or no mask at all) and the CURRENT
+        // image (including any prior AI result already applied).
+        const hasMask = engine.hasAiMaskContent();
         const [imageBlob, maskBlob] = await Promise.all([
           engine.exportBaseImageForAi(),
-          engine.exportAiMaskBlob(),
+          hasMask ? engine.exportAiMaskBlob() : Promise.resolve(null),
         ]);
         if (!stillCurrent()) return false;
 
