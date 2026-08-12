@@ -13,7 +13,7 @@ from fastapi import APIRouter
 from app.config import resolve_provider_name, settings
 from app.jobs.store import is_async_mode
 from app.schemas.ai_status import AiStatusResponse
-from app.services.inpainting.factory import is_real_provider_configured
+from app.services.inpainting.factory import is_gemini_provider_configured, is_replicate_provider_configured
 
 router = APIRouter(tags=["ai-edit"])
 
@@ -21,13 +21,26 @@ router = APIRouter(tags=["ai-edit"])
 @router.get("/ai/status", response_model=AiStatusResponse)
 def ai_status() -> AiStatusResponse:
     provider = resolve_provider_name()
+
+    if provider == "gemini":
+        configured = is_gemini_provider_configured()
+        return AiStatusResponse(
+            provider="gemini",
+            configured=configured,
+            model=settings.gemini_model if configured else None,
+            supportsMaskless=True,
+        )
+
     if provider == "real":
+        configured = is_replicate_provider_configured()
         return AiStatusResponse(
             provider="real",
-            configured=is_real_provider_configured(),
-            model=settings.replicate_model_version if is_real_provider_configured() else None,
+            configured=configured,
+            model=settings.replicate_model_version if configured else None,
+            supportsMaskless=False,
         )
-    return AiStatusResponse(provider="mock", configured=True, model=None)
+
+    return AiStatusResponse(provider="mock", configured=True, model=None, supportsMaskless=True)
 
 
 @router.get("/jobs-mode")

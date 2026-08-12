@@ -1,6 +1,7 @@
 import io
 import time
 
+import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 
@@ -116,10 +117,22 @@ def test_inpaint_missing_image_field_rejected():
     assert resp.status_code == 422  # FastAPI validation error for missing required field
 
 
-def test_inpaint_missing_mask_field_rejected():
+def test_inpaint_without_mask_is_accepted_as_instruction_only_edit():
+    """Mask is intentionally OPTIONAL (Gemini Integration Sprint) --
+    omitting it is a valid instruction-only edit request (Test 5 in
+    the sprint's acceptance criteria), not a validation error."""
     files = {"image": ("image.png", _png_bytes(), "image/png")}
-    resp = client.post("/api/v1/inpaint", files=files, data={"prompt": "edit"})
-    assert resp.status_code == 422
+    resp = client.post("/api/v1/inpaint", files=files, data={"prompt": "make the sky more dramatic"})
+    assert resp.status_code == 202
+    job_id = resp.json()["job_id"]
+    for _ in range(50):
+        status_resp = client.get(f"/api/v1/jobs/{job_id}")
+        body = status_resp.json()
+        if body["status"] in ("completed", "failed"):
+            break
+        time.sleep(0.05)
+    assert body["status"] == "completed"
+    assert body["result"]["success"] is True
 
 
 def test_inpaint_feather_radius_out_of_range_rejected():
@@ -324,3 +337,96 @@ def test_ai_status_reports_mock_by_default():
     body = resp.json()
     assert body["provider"] == "mock"
     assert body["configured"] is True
+
+
+# --- Regression tests: named colors must actually produce that color ---
+# Bug report: "color this area black" produced pink instead of black.
+# Root cause: the mock's "color" category picked an arbitrary
+# hash-derived hue instead of reading which color was actually named,
+# AND prompts like "make it blue" never even reached the color category
+# in the first place (an unrelated keyword match, e.g. "make it"
+# matching the "style" category, won first). Both are fixed: named-color
+# detection now happens at classification time (so it can't be shadowed
+# by a weaker keyword match) and is used directly as the tint target.
+
+
+def _run_inpaint_for_color_test(prompt: str, base_color=(200, 120, 60)):
+    image = _png_bytes(80, 60, color=base_color)
+    mask = _mask_bytes(80, 60)
+    job = _run_inpaint(image, mask, prompt)
+    assert job["status"] == "completed", f"prompt {prompt!r} did not complete: {job}"
+    asset_id = job["result"]["resultAssetId"]
+    png_bytes = client.get(f"/api/v1/assets/{asset_id}/file").content
+    region = (20, 15, 60, 45)
+    img = Image.open(io.BytesIO(png_bytes)).convert("RGB")
+    cropped = img.crop(region)
+    pixels = list(cropped.getdata())
+    avg = tuple(sum(c[i] for c in pixels) / len(pixels) for i in range(3))
+    return avg
+
+
+def test_named_color_black_produces_a_dark_result():
+    r, g, b = _run_inpaint_for_color_test("color this area black")
+    # Absolute-but-generous threshold, not a tight one: mask feathering
+    # legitimately softens the sampled region's edges back toward the
+    # original (bright orange) base color, so the region AVERAGE is
+    # darker than the base but not as dark as the fully-blended center.
+    assert r < 130 and g < 100 and b < 90, (
+        f"'black' should read as clearly darkened vs. the orange base (200,120,60), "
+        f"got rgb=({r:.0f},{g:.0f},{b:.0f})"
+    )
+
+
+def test_named_color_blue_is_actually_blue_not_style_category():
+    """Specifically the reported failure mode: 'make it X' contains the
+    word 'make it', which matches the (unrelated) style category's
+    keyword list -- the named color must still win."""
+    r, g, b = _run_inpaint_for_color_test("make it blue")
+    assert b > r and b > g, f"'make it blue' should be blue-dominant, got rgb=({r:.0f},{g:.0f},{b:.0f})"
+
+
+def test_named_color_red_reaches_color_category_with_no_color_keyword():
+    """'turn this area red' contains no word from _COLOR_KEYWORDS at
+    all (no 'color'/'tint'/etc.) -- previously fell through to the
+    unrelated 'generic' category entirely."""
+    r, g, b = _run_inpaint_for_color_test("turn this area red")
+    assert r > g and r > b, f"'turn this area red' should be red-dominant, got rgb=({r:.0f},{g:.0f},{b:.0f})"
+
+
+def test_removal_keyword_wins_over_incidental_color_mention():
+    """'remove the red car' must stay classified as removal, not get
+    hijacked into the color category just because 'red' appears."""
+    image = _png_bytes(80, 60, color=(200, 120, 60))
+    mask = _mask_bytes(80, 60)
+    job = _run_inpaint(image, mask, "remove the red car")
+    asset_id = job["result"]["resultAssetId"]
+    png_bytes = client.get(f"/api/v1/assets/{asset_id}/file").content
+    img = Image.open(io.BytesIO(png_bytes)).convert("HSV")
+    region = (20, 15, 60, 45)
+    cropped = img.crop(region)
+    s_channel = cropped.split()[1]
+    avg_saturation = sum(s_channel.getdata()) / len(list(s_channel.getdata()))
+    # Removal desaturates heavily (see _apply_removal_style) -- a red
+    # tint would instead be highly saturated. Low saturation confirms
+    # "removal" won, not "color".
+    assert avg_saturation < 60, (
+        f"'remove the red car' should still read as a desaturated removal, "
+        f"not a red tint (avg_saturation={avg_saturation:.1f})"
+    )
+
+
+def test_replicate_provider_rejects_maskless_request(monkeypatch):
+    """Traditional inpainting models (Flux Fill) are architecturally
+    mask-based -- unlike Gemini/mock, there's no instruction-only mode
+    to fall back to. Must fail cleanly, not silently ignore the
+    missing mask or crash."""
+    import asyncio
+
+    from app.config import settings
+    from app.services.inpainting.base import InpaintingProviderError
+    from app.services.inpainting.real_provider import RealGenerativeAIProvider
+
+    monkeypatch.setattr(settings, "replicate_api_token", "fake-token-for-test")
+    provider = RealGenerativeAIProvider()
+    with pytest.raises(InpaintingProviderError):
+        asyncio.run(provider.inpaint(_png_bytes(), None, "edit"))

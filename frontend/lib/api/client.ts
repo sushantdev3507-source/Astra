@@ -73,4 +73,11 @@ export const apiClient = {
   get: <T>(path: string, options?: RequestOptions) => request<T>(path, { ...options, method: "GET" }),
   postForm: <T>(path: string, formData: FormData, options?: RequestOptions) =>
     request<T>(path, { ...options, method: "POST", body: formData }),
+  postJson: <T>(path: string, body: unknown, options?: RequestOptions) =>
+    request<T>(path, {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(body),
+    }),
 };

@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useEditor } from "@/lib/editor/EditorProvider";
 import { useCanvasEngine } from "@/lib/editor/EngineContext";
 import { saveEditResult } from "@/lib/integration/result";
 import { clearSession } from "@/lib/persistence/sessionStore";
+import { uploadAsset, getAssetFileUrl } from "@/lib/api/assets";
+import { useAuth } from "@/lib/auth/AuthContext";
 import { BackendStatusIndicator } from "./BackendStatusIndicator";
 
 type ExportFormat = "image/png" | "image/jpeg";
@@ -13,9 +16,12 @@ type ExportFormat = "image/png" | "image/jpeg";
 export function Header() {
   const { state, dispatch } = useEditor();
   const engineRef = useCanvasEngine();
+  const auth = useAuth();
   const [isExporting, setIsExporting] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [format, setFormat] = useState<ExportFormat>("image/png");
+  const [isReplacing, setIsReplacing] = useState(false);
+  const replaceInputRef = useRef<HTMLInputElement>(null);
 
   function extensionFor(mime: ExportFormat) {
     return mime === "image/png" ? "png" : "jpg";
@@ -34,6 +40,28 @@ export function Header() {
     if (!confirmed) return;
     clearSession(); // don't offer to restore an asset the user just explicitly abandoned
     dispatch({ type: "asset/clear" });
+  }
+
+  /**
+   * "Replace" -- swaps ONLY the base image, keeping every existing
+   * text/shape object, the drawing layer, and crop intact. Different
+   * from "New Image" (handleNewImage above), which clears everything
+   * and starts fresh. Uploads through the same real asset pipeline as
+   * a normal upload -- engine.replaceBaseImage() then does the actual
+   * swap-in-place (see html-tool/src/engine.ts).
+   */
+  async function handleReplaceFile(file: File | undefined) {
+    const engine = engineRef.current;
+    if (!file || !engine) return;
+    setIsReplacing(true);
+    try {
+      const asset = await uploadAsset(file);
+      await engine.replaceBaseImage(getAssetFileUrl(asset));
+    } catch {
+      window.alert("Could not replace the image. Please try again.");
+    } finally {
+      setIsReplacing(false);
+    }
   }
 
   async function handleExport() {
@@ -96,6 +124,25 @@ export function Header() {
             </span>
             <button
               type="button"
+              onClick={() => replaceInputRef.current?.click()}
+              disabled={isReplacing}
+              title="Replace the base image, keeping text/shapes/drawing"
+              className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-400 transition hover:border-slate-600 hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isReplacing ? "Replacing…" : "Replace"}
+            </button>
+            <input
+              ref={replaceInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/jpg,image/webp"
+              className="hidden"
+              onChange={(e) => {
+                handleReplaceFile(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+            <button
+              type="button"
               onClick={handleNewImage}
               title="Load a different image"
               className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-400 transition hover:border-slate-600 hover:text-slate-200"
@@ -108,6 +155,27 @@ export function Header() {
 
       <div className="flex items-center gap-3">
         <BackendStatusIndicator />
+
+        {!auth.isLoading &&
+          (auth.user ? (
+            <div className="flex items-center gap-2 border-r border-slate-700/50 pr-3 text-xs text-slate-400">
+              <span className="hidden sm:inline">{auth.user.name}</span>
+              <button
+                type="button"
+                onClick={auth.logout}
+                className="rounded border border-slate-700 px-2 py-1 text-slate-300 hover:bg-slate-800"
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/auth"
+              className="border-r border-slate-700/50 pr-3 text-xs text-slate-400 hover:text-slate-200"
+            >
+              Sign in
+            </Link>
+          ))}
 
         <button
           type="button"

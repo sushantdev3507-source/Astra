@@ -24,6 +24,28 @@ export function Canvas() {
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
   const textEditorRef = useRef<HTMLTextAreaElement | null>(null);
   const suppressNextBlurRef = useRef(false);
+  const [showColorToast, setShowColorToast] = useState(false);
+
+  // Eyedropper picks are otherwise silent -- the tool auto-returns to
+  // Select right after sampling, with no other visible confirmation
+  // that anything happened (this was reported as "eyedropper does
+  // nothing" -- it DOES work, it just gave no feedback). A brief toast
+  // showing the picked swatch + hex closes that gap. Shown-state is
+  // tracked via a comparison STATE value updated during render (not a
+  // ref -- this project's lint config disallows ref reads during
+  // render, same as the Toolbar's eyedropper-consumption fix), so the
+  // effect below only handles the timer (an external-system concern),
+  // never a synchronous setState call.
+  const [lastToastedPick, setLastToastedPick] = useState<string | null>(null);
+  if (state.lastPickedColor && state.lastPickedColor !== lastToastedPick) {
+    setLastToastedPick(state.lastPickedColor);
+    setShowColorToast(true);
+  }
+  useEffect(() => {
+    if (!showColorToast) return;
+    const timer = setTimeout(() => setShowColorToast(false), 2200);
+    return () => clearTimeout(timer);
+  }, [showColorToast]);
 
   // Create the engine once the canvas element exists, tear down on unmount.
   useEffect(() => {
@@ -37,8 +59,24 @@ export function Canvas() {
       onSelectionChange: (id) => dispatch({ type: "selection/set", selection: id }),
       onToolChange: (tool) => dispatch({ type: "tool/set", tool }),
       onTextEditRequest: (id) => setEditingTextId(id),
+      onColorPicked: (hex) => dispatch({ type: "color/picked", hex }),
     });
     engineRef.current = engine;
+    // BUG FIX: this effect destroys and recreates the engine whenever
+    // state.asset toggles to/from null (e.g. switching to/from a blank
+    // page in a multi-page project -- see the dependency below). The
+    // brand-new engine instance has nothing loaded into it, but
+    // loadedAssetIdRef (below) is a SEPARATE ref that survives the
+    // engine's destruction -- without this reset, switching away from
+    // a page and back to it would see the SAME page+asset composite
+    // key as before, wrongly conclude "already loaded" on what is
+    // actually a fresh, blank engine, and skip calling loadImage()
+    // entirely. Symptom: the base image renders as nothing (the
+    // checkerboard "no image" background shows through) while
+    // doc.objects (drawn shapes/text) are still correctly present in
+    // state, since those live in React state, not the engine's now-
+    // stale load-tracking ref.
+    loadedAssetIdRef.current = null;
     return () => {
       engine.destroy();
       engineRef.current = null;
@@ -214,7 +252,23 @@ export function Canvas() {
             <div className="astra-ai-shimmer absolute inset-0 rounded-sm" />
             <div className="relative flex items-center gap-2 rounded-full border border-[#6366F1]/50 bg-slate-950/80 px-4 py-2 text-sm font-medium text-slate-100 shadow-lg backdrop-blur-sm">
               <span className="h-2 w-2 animate-pulse rounded-full bg-[#38BDF8]" />
+
               {aiBusyLabel}
+            </div>
+          </div>
+        )}
+
+        {showColorToast && state.lastPickedColor && (
+          <div
+            className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2"
+            aria-live="polite"
+          >
+            <div className="flex items-center gap-2.5 rounded-full border border-slate-700/50 bg-slate-950/90 px-4 py-2 text-sm text-slate-100 shadow-lg backdrop-blur-sm">
+              <span
+                className="h-4 w-4 rounded-full border border-white/20"
+                style={{ backgroundColor: state.lastPickedColor }}
+              />
+              Picked {state.lastPickedColor} — applied to brush &amp; shape fill
             </div>
           </div>
         )}

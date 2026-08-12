@@ -53,6 +53,24 @@ class Settings(BaseSettings):
     )
     real_provider_timeout_seconds: int = 120
 
+    # Gemini image-editing provider (Gemini Integration Sprint). See
+    # app/services/inpainting/gemini_provider.py for how these are used
+    # and GEMINI_INTEGRATION.md for exact setup instructions.
+    gemini_api_key: str = ""  # env: ASTRA_GEMINI_API_KEY
+    gemini_model: str = "gemini-3.1-flash-image"
+
+    # Authentication (placeholder implementation -- see
+    # app/services/auth/README.md). Signs/verifies session tokens.
+    # ASTRA_JWT_SECRET MUST be set to a real random value outside of
+    # local development -- the default below is intentionally obvious
+    # and insecure so it's impossible to mistake for a real secret; a
+    # startup warning fires if it's still in use (see app/main.py).
+    # Deliberately >=32 bytes even as a placeholder, since PyJWT itself
+    # warns on shorter HMAC-SHA256 keys -- no reason to trigger that
+    # warning on top of the already-loud startup warning below.
+    jwt_secret: str = "INSECURE-DEV-ONLY-CHANGE-ME-32-BYTES-MIN"  # env: ASTRA_JWT_SECRET
+    jwt_expiry_hours: int = 168  # 7 days
+
     # Async job processing (Sprint 4). If Redis is unreachable at
     # startup, Astra falls back to running jobs synchronously in-process
     # -- see app/jobs/store.py -- so local dev works without Redis/Celery

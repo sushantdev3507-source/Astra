@@ -33,6 +33,7 @@ from __future__ import annotations
 import hashlib
 import io
 import time
+from typing import Optional
 
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageOps
 
@@ -43,6 +44,41 @@ _ENHANCE_KEYWORDS = ("enhance", "sharpen", "brighten", "improve", "clarity", "cl
 _COLOR_KEYWORDS = ("colour", "color", "recolor", "recolour", "hue", "tint", "paint it", "dye")
 _ADDITION_KEYWORDS = ("add", "draw", "put", "place", "insert", "give it", "attach")
 _STYLE_KEYWORDS = ("style", "artistic", "sketch", "painting", "cartoon", "look like", "turn into", "make it")
+
+# Named colors the "color" category actually recognizes and targets
+# directly, rather than falling back to an arbitrary hash-derived hue.
+# (RGB, used as a direct tint target -- see _apply_color_style.)
+_NAMED_COLORS: dict[str, tuple[int, int, int]] = {
+    "black": (20, 20, 20),
+    "white": (235, 235, 235),
+    "red": (200, 40, 40),
+    "orange": (230, 130, 30),
+    "yellow": (225, 200, 40),
+    "green": (50, 160, 70),
+    "blue": (40, 90, 200),
+    "purple": (130, 60, 180),
+    "violet": (150, 70, 190),
+    "pink": (230, 110, 160),
+    "brown": (120, 80, 50),
+    "gray": (130, 130, 130),
+    "grey": (130, 130, 130),
+    "gold": (200, 170, 60),
+    "silver": (180, 180, 190),
+    "navy": (30, 45, 90),
+    "teal": (30, 140, 140),
+    "cyan": (60, 190, 210),
+    "magenta": (190, 50, 160),
+    "maroon": (110, 30, 40),
+    "turquoise": (50, 180, 170),
+}
+
+
+def _find_named_color(prompt: str) -> tuple[int, int, int] | None:
+    lowered = prompt.lower()
+    for name, rgb in _NAMED_COLORS.items():
+        if name in lowered:
+            return rgb
+    return None
 
 
 def _prompt_hash_int(prompt: str) -> int:
@@ -59,10 +95,23 @@ def _rotate_hue(image: Image.Image, degrees: int) -> Image.Image:
 
 def _classify_prompt(prompt: str) -> str:
     lowered = prompt.lower()
+
+    # Strong, deliberate action verbs win even if a color is also
+    # mentioned incidentally (e.g. "remove the red car" must stay
+    # "removal", not get hijacked into "color" just because "red"
+    # appears in the sentence).
     if any(kw in lowered for kw in _REMOVAL_KEYWORDS):
         return "removal"
     if any(kw in lowered for kw in _ENHANCE_KEYWORDS):
         return "enhance"
+
+    # An explicit, unambiguous color name ("make it blue", "turn this
+    # red", "color it black") is a strong enough signal to win over
+    # incidental phrase matches from the weaker categories below (e.g.
+    # "make it" matching the style category) -- checked before them.
+    if _find_named_color(prompt) is not None:
+        return "color"
+
     if any(kw in lowered for kw in _COLOR_KEYWORDS):
         return "color"
     if any(kw in lowered for kw in _ADDITION_KEYWORDS):
@@ -88,6 +137,18 @@ def _apply_enhance_style(region: Image.Image) -> Image.Image:
 
 
 def _apply_color_style(region: Image.Image, prompt: str) -> Image.Image:
+    named = _find_named_color(prompt)
+    if named is not None:
+        # A specific color WAS named in the prompt ("make it black",
+        # "turn it blue") -- tint directly toward that exact color
+        # rather than an arbitrary hash-derived hue, so the result
+        # actually reflects what was asked for. Blends with the
+        # original luminance so texture/shading isn't fully flattened.
+        target = Image.new("RGB", region.size, named)
+        return Image.blend(region, target, 0.85)
+
+    # No specific color named ("change the colours", "recolor this") --
+    # deterministic-but-arbitrary hue shift is the correct fallback here.
     hue_shift = _prompt_hash_int(prompt) % 360
     out = _rotate_hue(region, hue_shift)
     out = ImageEnhance.Color(out).enhance(1.6)
@@ -127,13 +188,19 @@ def _apply_generic_style(region: Image.Image, prompt: str) -> Image.Image:
 class MockInpaintingProvider(InpaintingProvider):
     name = "mock"
 
-    async def inpaint(self, image_bytes: bytes, mask_bytes: bytes, prompt: str) -> InpaintResult:
+    async def inpaint(self, image_bytes: bytes, mask_bytes: Optional[bytes], prompt: str) -> InpaintResult:
         start = time.monotonic()
         try:
             base = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-            mask = Image.open(io.BytesIO(mask_bytes)).convert("L")
-            if mask.size != base.size:
-                mask = mask.resize(base.size)
+            if mask_bytes is not None:
+                mask = Image.open(io.BytesIO(mask_bytes)).convert("L")
+                if mask.size != base.size:
+                    mask = mask.resize(base.size)
+            else:
+                # No mask -- maskless/instruction-only edit (mirrors
+                # Gemini's supported mode). Apply the effect to the
+                # WHOLE image: an all-white mask.
+                mask = Image.new("L", base.size, 255)
 
             effective_prompt = prompt or "edit"
             category = _classify_prompt(effective_prompt)

@@ -13,7 +13,8 @@ export type ToolId =
   | "text"
   | "shape"
   | "crop"
-  | "ai-edit";
+  | "ai-edit"
+  | "eyedropper";
 
 export type ShapeKind = "rect" | "ellipse" | "line" | "triangle" | "arrow" | "star";
 
@@ -29,6 +30,21 @@ interface BaseObject {
   visible: boolean;
   /** Locked objects can't be selected/moved/resized/rotated/deleted via pointer interaction. */
   locked: boolean;
+  /**
+   * Drop shadow, applicable to any object (text or shape). Mutually
+   * exclusive with `glow` in practice -- if both are set, glow takes
+   * visual precedence (see engine.ts's paintObject). null/undefined
+   * means no shadow.
+   */
+  shadow?: { color: string; blur: number; offsetX: number; offsetY: number } | null;
+  /**
+   * A glow effect -- implemented as a zero-offset, typically-larger-
+   * blur shadow, which reads visually as a halo rather than a cast
+   * shadow. Same underlying Canvas2D shadow* mechanism as `shadow`
+   * above; kept as a separate field rather than a "shadow with offset
+   * 0" convention so the UI can toggle them independently and clearly.
+   */
+  glow?: { color: string; blur: number } | null;
 }
 
 export interface TextObject extends BaseObject {
@@ -46,6 +62,13 @@ export interface ShapeObject extends BaseObject {
   fill: string;
   stroke: string;
   strokeWidth: number;
+  /**
+   * When set, overrides `fill` with a two-color linear gradient at the
+   * given angle (degrees, 0 = left-to-right). `fill` is kept as the
+   * fallback/solid value so turning the gradient off doesn't lose the
+   * last solid color choice.
+   */
+  fillGradient?: { from: string; to: string; angleDeg: number } | null;
 }
 
 /** A single freehand draw/erase pass, rasterized once completed. */

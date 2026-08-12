@@ -21,6 +21,7 @@ const TOOL_SHORTCUTS: Record<string, ToolId> = {
   t: "text",
   s: "shape",
   c: "crop",
+  i: "eyedropper",
   m: "ai-edit",
 };
 

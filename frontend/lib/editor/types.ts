@@ -19,6 +19,7 @@ export const TOOLS: ToolDefinition[] = [
   { id: "text", label: "Text", isPlaceholder: false },
   { id: "shape", label: "Shape", isPlaceholder: false },
   { id: "crop", label: "Crop", isPlaceholder: false },
+  { id: "eyedropper", label: "Eyedropper", isPlaceholder: false },
   { id: "ai-edit", label: "AI Edit", isPlaceholder: false },
 ];
 
@@ -71,6 +72,10 @@ export interface EditorState {
    */
   pendingRestoreDocument: CanvasSnapshot | null;
 
+  /** Hex color from the most recent Eyedropper pick -- Toolbar applies
+   * it to whichever color field is contextually relevant. */
+  lastPickedColor: string | null;
+
   /**
    * Multi-page project state (Sprint 5 foundation). `asset`/`canvas`/
    * `history`/`historyIndex` above always mirror `pages[activePageId]`
@@ -105,6 +110,7 @@ export const initialEditorState: EditorState = {
   uploadError: null,
   backendOnline: null,
   pendingRestoreDocument: null,
+  lastPickedColor: null,
   pages: { [INITIAL_PAGE_ID]: createBlankPage(INITIAL_PAGE_ID, "Page 1") },
   pageOrder: [INITIAL_PAGE_ID],
   activePageId: INITIAL_PAGE_ID,

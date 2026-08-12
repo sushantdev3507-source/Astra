@@ -17,6 +17,10 @@ export type { EditorDocument, EditorObject, TextObject, ShapeObject, ShapeKind, 
 export interface BrushOptions {
   color: string;
   size: number;
+  /** 0-1. Applied via ctx.globalAlpha for the stroke -- a simple,
+   * real "soft brush" capability without a full multi-brush-type
+   * system. Defaults to 1 (fully opaque) if unset. */
+  opacity?: number;
 }
 
 export interface ShapeStyleOptions {
@@ -50,6 +54,8 @@ export interface EngineCallbacks {
    * WHEN and WHICH object.
    */
   onTextEditRequest?: (objectId: string) => void;
+  /** Fired when the Eyedropper tool samples a pixel -- hex color string. */
+  onColorPicked?: (hex: string) => void;
 }
 
 const HANDLE_SIZE = 10;
@@ -104,6 +110,11 @@ export class CanvasEngine {
     stroke: "#6366f1",
     strokeWidth: 2,
   };
+  /** Which preset the Text tool places next -- set via setTextPreset()
+   * before clicking the canvas (Toolbar exposes "Heading"/"Paragraph"
+   * buttons). Not a new object type -- just different addTextAt()
+   * defaults, since a paragraph is a text object same as a heading. */
+  private textPreset: "heading" | "paragraph" = "heading";
 
   // Transient (non-committed) interaction state
   private dragMode: "none" | "move" | "resize" | "rotate" | "draw" | "shape" | "crop" | "ai-mask" = "none";
@@ -261,19 +272,24 @@ export class CanvasEngine {
 
   // ── Object editing (invoked from the Properties panel, React-owned UI) ──
 
+  setTextPreset(preset: "heading" | "paragraph") {
+    this.textPreset = preset;
+  }
+
   addTextAt(sourceX: number, sourceY: number): string {
+    const isParagraph = this.textPreset === "paragraph";
     const obj: TextObject = {
       id: generateObjectId("text"),
       type: "text",
       x: sourceX,
       y: sourceY,
-      width: 200,
-      height: 40,
+      width: isParagraph ? 320 : 200,
+      height: isParagraph ? 100 : 40,
       rotation: 0,
       visible: true,
       locked: false,
-      text: "New text",
-      fontSize: 24,
+      text: isParagraph ? "Add your paragraph text here." : "New text",
+      fontSize: isParagraph ? 15 : 24,
       color: "#f4f4f5",
       bold: false,
       italic: false,
@@ -299,6 +315,25 @@ export class CanvasEngine {
     this.selectObject(null);
     this.render();
     this.commit();
+  }
+
+  /** Clones the selected text/shape object with a small offset so the
+   * copy is visibly distinct from the original, selects the copy. */
+  duplicateSelected(): string | null {
+    const original = this.getSelectedObject();
+    if (!original) return null;
+    const OFFSET = 16;
+    const copy = {
+      ...original,
+      id: generateObjectId(original.type),
+      x: original.x + OFFSET,
+      y: original.y + OFFSET,
+    };
+    this.doc.objects.push(copy);
+    this.selectObject(copy.id);
+    this.render();
+    this.commit();
+    return copy.id;
   }
 
   // ── Layers (Sprint 3) ────────────────────────────────────────────
@@ -459,6 +494,31 @@ export class CanvasEngine {
    * image pixels change. Clears the AI mask afterward (it was scoped
    * to this generation) and hands control back to the Select tool.
    */
+  /**
+   * Synchronously samples the composited pixel color at a SOURCE
+   * coordinate (the "Eyedropper" tool) -- reuses the exact same
+   * drawSceneSync() the live render() path uses (with the already-
+   * cached this.layerImage, so it stays synchronous, no async decode
+   * wait), just onto a 1:1-scale offscreen canvas instead of the
+   * zoomed visible one, so source coordinates map directly with no
+   * transform math needed here.
+   */
+  pickColorAt(sourceX: number, sourceY: number): string | null {
+    if (!this.sourceImage) return null;
+    const off = document.createElement("canvas");
+    off.width = this.doc.sourceWidth;
+    off.height = this.doc.sourceHeight;
+    const octx = off.getContext("2d", { willReadFrequently: true });
+    if (!octx) return null;
+    this.drawSceneSync(octx, { forExport: true, layerImageOverride: this.layerImage });
+    const px = Math.round(sourceX);
+    const py = Math.round(sourceY);
+    if (px < 0 || py < 0 || px >= off.width || py >= off.height) return null;
+    const data = octx.getImageData(px, py, 1, 1).data;
+    const toHex = (n: number) => n.toString(16).padStart(2, "0");
+    return `#${toHex(data[0])}${toHex(data[1])}${toHex(data[2])}`;
+  }
+
   async applyAiResult(resultImageUrl: string): Promise<void> {
     const img = await loadHtmlImage(resultImageUrl);
     this.sourceImage = img;
@@ -468,6 +528,24 @@ export class CanvasEngine {
     this.render();
     this.commit();
     this.callbacks.onToolChange?.("select");
+  }
+
+  /**
+   * Swaps the base image for a different one (the "Replace" feature)
+   * while preserving everything else -- objects, drawing layer, crop,
+   * zoom. Modeled directly on applyAiResult()'s swap-in-place pattern.
+   * The replacement is drawn at the CURRENT canvas dimensions (same
+   * convention as an AI result) -- a differently-shaped image will be
+   * stretched to fit rather than resizing the canvas, so existing
+   * objects/crop stay meaningful relative to it.
+   */
+  async replaceBaseImage(imageUrl: string): Promise<void> {
+    const img = await loadHtmlImage(imageUrl);
+    this.sourceImage = img;
+    this.doc.baseImageOverride = imageUrl;
+    this.baseImageOverrideSrc = imageUrl;
+    this.render();
+    this.commit();
   }
 
   // ── Export ───────────────────────────────────────────────────
@@ -635,6 +713,24 @@ export class CanvasEngine {
     ctx.rotate(obj.rotation);
     ctx.translate(-obj.width / 2, -obj.height / 2);
 
+    // Shadow/glow (Sprint 6): both use Canvas2D's single shared shadow*
+    // state -- glow takes precedence when both happen to be set (see
+    // the doc comment on BaseObject.glow in types.ts). Applied BEFORE
+    // the fill/stroke calls below so it affects everything drawn for
+    // this object; ctx.restore() at the end clears it for whatever's
+    // painted next.
+    if (obj.glow) {
+      ctx.shadowColor = obj.glow.color;
+      ctx.shadowBlur = obj.glow.blur;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+    } else if (obj.shadow) {
+      ctx.shadowColor = obj.shadow.color;
+      ctx.shadowBlur = obj.shadow.blur;
+      ctx.shadowOffsetX = obj.shadow.offsetX;
+      ctx.shadowOffsetY = obj.shadow.offsetY;
+    }
+
     if (obj.type === "text") {
       const weight = obj.bold ? "bold" : "normal";
       const style = obj.italic ? "italic" : "normal";
@@ -643,7 +739,7 @@ export class CanvasEngine {
       ctx.textBaseline = "top";
       wrapText(ctx, obj.text, 0, 0, obj.width, obj.fontSize * 1.25);
     } else if (obj.type === "shape") {
-      ctx.fillStyle = obj.fill;
+      ctx.fillStyle = obj.fillGradient ? makeLinearGradient(ctx, obj.fillGradient, obj.width, obj.height) : obj.fill;
       ctx.strokeStyle = obj.stroke;
       ctx.lineWidth = obj.strokeWidth;
       if (obj.shapeKind === "rect") {
@@ -854,6 +950,13 @@ export class CanvasEngine {
       this.aiMaskStrokeTo(x, y, true);
       return;
     }
+
+    if (this.tool === "eyedropper") {
+      const hex = this.pickColorAt(x, y);
+      if (hex) this.callbacks.onColorPicked?.(hex);
+      this.callbacks.onToolChange?.("select");
+      return;
+    }
   }
 
   private handleDoubleClick(e: MouseEvent) {
@@ -1021,6 +1124,7 @@ export class CanvasEngine {
     if (!lctx) return;
 
     lctx.globalCompositeOperation = this.tool === "eraser" ? "destination-out" : "source-over";
+    lctx.globalAlpha = this.brush.opacity ?? 1;
     lctx.strokeStyle = this.brush.color;
     lctx.lineWidth = this.brush.size;
     lctx.lineCap = "round";
@@ -1099,6 +1203,29 @@ export class CanvasEngine {
 }
 
 // ── Free functions ──────────────────────────────────────────────
+
+/** Builds a linear gradient spanning an object's local (post-rotation-
+ * transform) bounding box at the given angle. 0deg = left-to-right,
+ * 90deg = top-to-bottom, matching the common "angle" convention used
+ * in most design tools rather than raw trigonometric radians. */
+function makeLinearGradient(
+  ctx: CanvasRenderingContext2D,
+  spec: { from: string; to: string; angleDeg: number },
+  width: number,
+  height: number
+): CanvasGradient {
+  const rad = (spec.angleDeg * Math.PI) / 180;
+  const cx = width / 2;
+  const cy = height / 2;
+  // Half-diagonal ensures the gradient line fully spans the box at any angle.
+  const half = Math.sqrt(width * width + height * height) / 2;
+  const dx = Math.cos(rad) * half;
+  const dy = Math.sin(rad) * half;
+  const gradient = ctx.createLinearGradient(cx - dx, cy - dy, cx + dx, cy + dy);
+  gradient.addColorStop(0, spec.from);
+  gradient.addColorStop(1, spec.to);
+  return gradient;
+}
 
 /** Draws a line from (0,0) to (w,h) with a triangular arrowhead at the end. */
 function paintArrow(

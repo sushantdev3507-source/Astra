@@ -13,6 +13,121 @@ function formatBytes(bytes?: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+type Updater = (partial: Partial<TextObject> | Partial<ShapeObject>) => void;
+
+/** Shadow + Glow controls, shared between text and shape objects (both
+ * extend BaseObject, which carries these fields -- see types.ts). */
+function EffectsControls({ selected, update }: { selected: EditorObject; update: Updater }) {
+  const shadow = selected.shadow;
+  const glow = selected.glow;
+
+  return (
+    <div className="flex flex-col gap-2 border-t border-slate-800 pt-2.5">
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-slate-400">Shadow</span>
+        <button
+          type="button"
+          onClick={() =>
+            update({
+              shadow: shadow ? null : { color: "#000000", blur: 8, offsetX: 4, offsetY: 4 },
+              glow: null, // mutually exclusive -- see BaseObject.glow's doc comment
+            })
+          }
+          className={`rounded px-2 py-0.5 text-[11px] font-medium ${shadow ? "bg-[#6366F1] text-white" : "border border-slate-700 text-slate-400"}`}
+        >
+          {shadow ? "On" : "Off"}
+        </button>
+      </div>
+      {shadow && (
+        <div className="flex flex-col gap-1.5 pl-1">
+          <label className="flex items-center justify-between text-[11px] text-slate-500">
+            Color
+            <input
+              key={`shadowColor-${selected.id}`}
+              type="color"
+              defaultValue={shadow.color}
+              onChange={(e) => update({ shadow: { ...shadow, color: e.target.value } })}
+              className="h-5 w-7 cursor-pointer rounded border border-slate-700 bg-transparent"
+            />
+          </label>
+          <label className="flex items-center justify-between text-[11px] text-slate-500">
+            Blur
+            <input
+              key={`shadowBlur-${selected.id}`}
+              type="number"
+              min={0}
+              defaultValue={shadow.blur}
+              onBlur={(e) => update({ shadow: { ...shadow, blur: Number(e.target.value) || 0 } })}
+              className="w-14 rounded border border-slate-700 bg-slate-900 px-1.5 py-0.5 text-right text-slate-200"
+            />
+          </label>
+          <label className="flex items-center justify-between text-[11px] text-slate-500">
+            Offset X
+            <input
+              key={`shadowOffX-${selected.id}`}
+              type="number"
+              defaultValue={shadow.offsetX}
+              onBlur={(e) => update({ shadow: { ...shadow, offsetX: Number(e.target.value) || 0 } })}
+              className="w-14 rounded border border-slate-700 bg-slate-900 px-1.5 py-0.5 text-right text-slate-200"
+            />
+          </label>
+          <label className="flex items-center justify-between text-[11px] text-slate-500">
+            Offset Y
+            <input
+              key={`shadowOffY-${selected.id}`}
+              type="number"
+              defaultValue={shadow.offsetY}
+              onBlur={(e) => update({ shadow: { ...shadow, offsetY: Number(e.target.value) || 0 } })}
+              className="w-14 rounded border border-slate-700 bg-slate-900 px-1.5 py-0.5 text-right text-slate-200"
+            />
+          </label>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-slate-400">Glow</span>
+        <button
+          type="button"
+          onClick={() =>
+            update({
+              glow: glow ? null : { color: "#38BDF8", blur: 16 },
+              shadow: null, // mutually exclusive
+            })
+          }
+          className={`rounded px-2 py-0.5 text-[11px] font-medium ${glow ? "bg-[#6366F1] text-white" : "border border-slate-700 text-slate-400"}`}
+        >
+          {glow ? "On" : "Off"}
+        </button>
+      </div>
+      {glow && (
+        <div className="flex flex-col gap-1.5 pl-1">
+          <label className="flex items-center justify-between text-[11px] text-slate-500">
+            Color
+            <input
+              key={`glowColor-${selected.id}`}
+              type="color"
+              defaultValue={glow.color}
+              onChange={(e) => update({ glow: { ...glow, color: e.target.value } })}
+              className="h-5 w-7 cursor-pointer rounded border border-slate-700 bg-transparent"
+            />
+          </label>
+          <label className="flex items-center justify-between text-[11px] text-slate-500">
+            Blur
+            <input
+              key={`glowBlur-${selected.id}`}
+              type="number"
+              min={0}
+              defaultValue={glow.blur}
+              onBlur={(e) => update({ glow: { ...glow, blur: Number(e.target.value) || 0 } })}
+              className="w-14 rounded border border-slate-700 bg-slate-900 px-1.5 py-0.5 text-right text-slate-200"
+            />
+          </label>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function PropertiesPanel() {
   const { state } = useEditor();
   const engineRef = useCanvasEngine();
@@ -60,6 +175,7 @@ export function PropertiesPanel() {
           <label className="flex items-center justify-between text-xs text-slate-400">
             Font size
             <input
+              key={`fontSize-${selected.id}`}
               type="number"
               defaultValue={selected.fontSize}
               onBlur={(e) => update({ fontSize: Number(e.target.value) || selected.fontSize })}
@@ -69,6 +185,7 @@ export function PropertiesPanel() {
           <label className="flex items-center justify-between text-xs text-slate-400">
             Color
             <input
+              key={`color-${selected.id}`}
               type="color"
               defaultValue={selected.color}
               onChange={(e) => update({ color: e.target.value })}
@@ -91,29 +208,94 @@ export function PropertiesPanel() {
               I
             </button>
           </div>
-          <button
-            type="button"
-            onClick={() => engineRef.current?.deleteSelected()}
-            className="rounded border border-red-900 px-2 py-1 text-xs text-red-400 hover:bg-red-950"
-          >
-            Delete
-          </button>
+          <EffectsControls selected={selected} update={update} />
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => engineRef.current?.duplicateSelected()}
+              className="flex-1 rounded border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:bg-slate-800"
+            >
+              Duplicate
+            </button>
+            <button
+              type="button"
+              onClick={() => engineRef.current?.deleteSelected()}
+              className="flex-1 rounded border border-red-900 px-2 py-1 text-xs text-red-400 hover:bg-red-950"
+            >
+              Delete
+            </button>
+          </div>
         </div>
       ) : selected?.type === "shape" ? (
         <div className="flex flex-col gap-3 text-sm">
           <p className="text-xs text-slate-500">Shape ({selected.shapeKind})</p>
-          <label className="flex items-center justify-between text-xs text-slate-400">
-            Fill
-            <input
-              type="color"
-              defaultValue={selected.fill.startsWith("#") ? selected.fill : "#6366f1"}
-              onChange={(e) => update({ fill: e.target.value })}
-              className="h-6 w-8 cursor-pointer rounded border border-slate-700 bg-transparent"
-            />
-          </label>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-400">Gradient fill</span>
+            <button
+              type="button"
+              onClick={() =>
+                update({
+                  fillGradient: selected.fillGradient
+                    ? null
+                    : { from: selected.fill.startsWith("#") ? selected.fill : "#6366f1", to: "#38BDF8", angleDeg: 90 },
+                })
+              }
+              className={`rounded px-2 py-0.5 text-[11px] font-medium ${selected.fillGradient ? "bg-[#6366F1] text-white" : "border border-slate-700 text-slate-400"}`}
+            >
+              {selected.fillGradient ? "On" : "Off"}
+            </button>
+          </div>
+          {selected.fillGradient ? (
+            <div className="flex flex-col gap-1.5 pl-1">
+              <label className="flex items-center justify-between text-[11px] text-slate-500">
+                From
+                <input
+                  key={`gradFrom-${selected.id}`}
+                  type="color"
+                  defaultValue={selected.fillGradient.from}
+                  onChange={(e) => update({ fillGradient: { ...selected.fillGradient!, from: e.target.value } })}
+                  className="h-5 w-7 cursor-pointer rounded border border-slate-700 bg-transparent"
+                />
+              </label>
+              <label className="flex items-center justify-between text-[11px] text-slate-500">
+                To
+                <input
+                  key={`gradTo-${selected.id}`}
+                  type="color"
+                  defaultValue={selected.fillGradient.to}
+                  onChange={(e) => update({ fillGradient: { ...selected.fillGradient!, to: e.target.value } })}
+                  className="h-5 w-7 cursor-pointer rounded border border-slate-700 bg-transparent"
+                />
+              </label>
+              <label className="flex items-center justify-between text-[11px] text-slate-500">
+                Angle
+                <input
+                  key={`gradAngle-${selected.id}`}
+                  type="number"
+                  defaultValue={selected.fillGradient.angleDeg}
+                  onBlur={(e) =>
+                    update({ fillGradient: { ...selected.fillGradient!, angleDeg: Number(e.target.value) || 0 } })
+                  }
+                  className="w-14 rounded border border-slate-700 bg-slate-900 px-1.5 py-0.5 text-right text-slate-200"
+                />
+              </label>
+            </div>
+          ) : (
+            <label className="flex items-center justify-between text-xs text-slate-400">
+              Fill
+              <input
+                key={`fill-${selected.id}`}
+                type="color"
+                defaultValue={selected.fill.startsWith("#") ? selected.fill : "#6366f1"}
+                onChange={(e) => update({ fill: e.target.value })}
+                className="h-6 w-8 cursor-pointer rounded border border-slate-700 bg-transparent"
+              />
+            </label>
+          )}
           <label className="flex items-center justify-between text-xs text-slate-400">
             Stroke width
             <input
+              key={`strokeWidth-${selected.id}`}
               type="number"
               defaultValue={selected.strokeWidth}
               onBlur={(e) => update({ strokeWidth: Number(e.target.value) })}
@@ -123,13 +305,23 @@ export function PropertiesPanel() {
           <p className="text-xs text-slate-500">
             {Math.round(selected.width)} × {Math.round(selected.height)}px
           </p>
-          <button
-            type="button"
-            onClick={() => engineRef.current?.deleteSelected()}
-            className="rounded border border-red-900 px-2 py-1 text-xs text-red-400 hover:bg-red-950"
-          >
-            Delete
-          </button>
+          <EffectsControls selected={selected} update={update} />
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => engineRef.current?.duplicateSelected()}
+              className="flex-1 rounded border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:bg-slate-800"
+            >
+              Duplicate
+            </button>
+            <button
+              type="button"
+              onClick={() => engineRef.current?.deleteSelected()}
+              className="flex-1 rounded border border-red-900 px-2 py-1 text-xs text-red-400 hover:bg-red-950"
+            >
+              Delete
+            </button>
+          </div>
         </div>
       ) : (
         <dl className="flex flex-col gap-2 text-sm">
