@@ -88,7 +88,7 @@ export default function Home() {
               href="/editor"
               className="flex items-center justify-center gap-2 rounded-md border border-slate-700 px-6 py-3 text-sm font-medium text-slate-200 transition hover:bg-slate-800"
             >
-              Continue as Guest
+              Continue as Sonam
             </Link>
           </div>
         </div>

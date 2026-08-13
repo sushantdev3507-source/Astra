@@ -73,7 +73,7 @@ export default function WorkspacePage() {
               href="/editor"
               className="mt-5 flex items-center justify-center gap-2 rounded-md bg-gradient-to-r from-[#6366F1] to-[#38BDF8] py-2.5 text-sm font-medium text-white"
             >
-              Continue as Guest <ArrowRight size={15} />
+              Continue as Sonam <ArrowRight size={15} />
             </Link>
           </div>
 
