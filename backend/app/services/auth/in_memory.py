@@ -45,6 +45,15 @@ class InMemoryUserRepository(UserRepository):
     async def get_by_id(self, user_id: str) -> Optional[User]:
         return self._users_by_id.get(user_id)
 
+    async def update_password(self, user_id: str, password_hash: str) -> User:
+        user = self._users_by_id.get(user_id)
+
+        if not user:
+            raise ValueError("User not found.")
+
+        user.password_hash = password_hash
+        return user
+
 
 # Module-level singleton -- intentional. This mirrors how the mock
 # inpainting provider or an in-process job registry would work: state
