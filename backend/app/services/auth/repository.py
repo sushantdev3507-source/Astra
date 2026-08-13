@@ -48,3 +48,7 @@ class UserRepository(ABC):
     @abstractmethod
     async def get_by_id(self, user_id: str) -> Optional[User]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def update_password(self, user_id: str, password_hash: str) -> User:
+        raise NotImplementedError
