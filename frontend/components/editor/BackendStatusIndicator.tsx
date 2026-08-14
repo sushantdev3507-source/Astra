@@ -41,41 +41,44 @@ export function BackendStatusIndicator() {
         </span>
       )}
 
-      {aiStatus && (
-        <span
-          className={[
-            "flex items-center gap-1.5",
-            aiStatus.provider === "real" && aiStatus.configured
-              ? "text-[#38BDF8]"
-              : aiStatus.provider === "real"
-                ? "text-amber-400"
-                : "text-slate-400",
-          ].join(" ")}
-          title={
-            aiStatus.provider === "real"
-              ? aiStatus.configured
-                ? `Real AI provider active (${aiStatus.model ?? "configured"})`
-                : "AI_PROVIDER=real is set, but no credential is configured -- see README.md"
-              : "Using the deterministic mock AI provider"
-          }
-        >
-          <span
-            className={[
-              "h-2 w-2 rounded-full",
-              aiStatus.provider === "real" && aiStatus.configured
-                ? "bg-[#38BDF8]"
+      {aiStatus && (() => {
+        // BUG FIX: this used to special-case ONLY provider === "real"
+        // (Replicate) -- Gemini and Pollinations both fell through to
+        // the generic else-branch and displayed "Mock AI" even when
+        // genuinely configured and active. Generalized to treat any
+        // non-mock provider the same way, so this stays correct for
+        // whichever provider AI_PROVIDER actually names, present or
+        // future, without needing a new branch added here every time.
+        const isRealProvider = aiStatus.provider !== "mock";
+        const providerLabel =
+          aiStatus.provider === "gemini"
+            ? "Gemini"
+            : aiStatus.provider === "pollinations"
+              ? "Pollinations"
+              : aiStatus.provider === "grok"
+                ? "Grok"
                 : aiStatus.provider === "real"
-                  ? "bg-amber-400"
-                  : "bg-slate-500",
-            ].join(" ")}
-          />
-          {aiStatus.provider === "real"
-            ? aiStatus.configured
-              ? "Real AI"
-              : "Real AI (not configured)"
-            : "Mock AI"}
-        </span>
-      )}
+                  ? "Real AI"
+                  : "Mock AI";
+        const isActive = isRealProvider && aiStatus.configured;
+        return (
+          <span
+            className={["flex items-center gap-1.5", isActive ? "text-[#38BDF8]" : isRealProvider ? "text-amber-400" : "text-slate-400"].join(" ")}
+            title={
+              isRealProvider
+                ? aiStatus.configured
+                  ? `${providerLabel} provider active${aiStatus.model ? ` (${aiStatus.model})` : ""}`
+                  : `AI_PROVIDER=${aiStatus.provider} is set, but no credential is configured -- see README.md`
+                : "Using the deterministic mock AI provider"
+            }
+          >
+            <span
+              className={["h-2 w-2 rounded-full", isActive ? "bg-[#38BDF8]" : isRealProvider ? "bg-amber-400" : "bg-slate-500"].join(" ")}
+            />
+            {isRealProvider ? (aiStatus.configured ? providerLabel : `${providerLabel} (not configured)`) : "Mock AI"}
+          </span>
+        );
+      })()}
 
       {isAiBusy && (
         <span className="flex items-center gap-1.5 text-[#6366F1]">

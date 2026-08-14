@@ -24,7 +24,7 @@ export interface JobStatusResponse {
 }
 
 export interface AiProviderStatus {
-  provider: "mock" | "real" | "gemini";
+  provider: "mock" | "real" | "gemini" | "pollinations" | "grok";
   configured: boolean;
   model?: string | null;
   supportsMaskless?: boolean;

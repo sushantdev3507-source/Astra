@@ -13,7 +13,7 @@ class AiStatusResponse(BaseModel):
     backend responds.
     """
 
-    provider: str  # "mock" | "real" | "gemini"
-    configured: bool  # for "real"/"gemini": is a credential actually present?
+    provider: str  # "mock" | "real" | "gemini" | "pollinations"
+    configured: bool  # for "real"/"gemini"/"pollinations": is a credential actually present?
     model: str | None = None  # only set when configured
     supportsMaskless: bool = False  # can this provider edit without a painted mask?

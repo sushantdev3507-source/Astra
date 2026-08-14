@@ -59,6 +59,24 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""  # env: ASTRA_GEMINI_API_KEY
     gemini_model: str = "gemini-3.1-flash-image"
 
+    # Pollinations image-editing provider (Pollinations Integration
+    # Sprint). See app/services/inpainting/pollinations_provider.py.
+    # "kontext" (Flux Kontext) is the default -- an instruction-based
+    # editing model, the closest Pollinations equivalent to what this
+    # pipeline needs; distinct from Pollinations' "nanobanana" model,
+    # which is Gemini-based and would be redundant given we already
+    # have a native Gemini provider.
+    pollinations_api_key: str = ""  # env: ASTRA_POLLINATIONS_API_KEY
+    pollinations_image_model: str = "kontext"  # env: ASTRA_POLLINATIONS_IMAGE_MODEL
+
+    # Grok (xAI Imagine) image-editing provider. See
+    # app/services/inpainting/grok_provider.py for how these are used.
+    # Model defaults to the confirmed-API-available standard tier, NOT
+    # the newer grok-imagine-image-2.0 (API access unconfirmed as of
+    # its Aug 2026 release) -- see that file's module docstring.
+    grok_api_key: str = ""  # env: ASTRA_GROK_API_KEY
+    grok_image_model: str = "grok-imagine-image"  # env: ASTRA_GROK_IMAGE_MODEL
+
     # Authentication (placeholder implementation -- see
     # app/services/auth/README.md). Signs/verifies session tokens.
     # ASTRA_JWT_SECRET MUST be set to a real random value outside of

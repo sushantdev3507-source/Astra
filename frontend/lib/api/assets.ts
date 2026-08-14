@@ -32,7 +32,7 @@ export async function uploadAsset(file: File): Promise<Asset> {
 
 /**
  * Look up a previously uploaded asset's metadata by id, without
- * re-uploading. Used to resolve an external (5onam.ai) launch that
+ * re-uploading. Used to resolve an external (Sonal.ai) launch that
  * references an assetId.
  */
 export async function getAssetById(assetId: string): Promise<Asset> {
@@ -46,6 +46,11 @@ export async function getAssetById(assetId: string): Promise<Asset> {
 /** Resolve a full, fetchable URL for an asset returned by the backend. */
 export function getAssetFileUrl(asset: Asset): string {
   if (!asset.url) return "";
-  if (asset.url.startsWith("http")) return asset.url;
+  // data: URIs (embedded image bytes, used by .astra project files for
+  // portability -- see lib/project/astraFile.ts) and absolute http(s)
+  // URLs are both already-complete and must be returned unchanged;
+  // only a relative backend path (e.g. "/api/v1/assets/xyz/file") gets
+  // the API base prepended.
+  if (asset.url.startsWith("http") || asset.url.startsWith("data:")) return asset.url;
   return `${getApiBaseUrl()}${asset.url}`;
 }

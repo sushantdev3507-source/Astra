@@ -550,12 +550,12 @@ export class CanvasEngine {
 
   // ── Export ───────────────────────────────────────────────────
 
-  async exportToBlob(mimeType: "image/png" | "image/jpeg" = "image/png"): Promise<Blob> {
+  async exportToBlob(mimeType: "image/png" | "image/jpeg" | "image/webp" = "image/png"): Promise<Blob> {
     return this.exportComposite(mimeType, { ignoreCrop: false, includeAiMask: false });
   }
 
   private async exportComposite(
-    mimeType: "image/png" | "image/jpeg",
+    mimeType: "image/png" | "image/jpeg" | "image/webp",
     opts: { ignoreCrop: boolean; includeAiMask: boolean }
   ): Promise<Blob> {
     const fullRegion = { x: 0, y: 0, width: this.doc.sourceWidth, height: this.doc.sourceHeight };

@@ -13,7 +13,12 @@ from fastapi import APIRouter
 from app.config import resolve_provider_name, settings
 from app.jobs.store import is_async_mode
 from app.schemas.ai_status import AiStatusResponse
-from app.services.inpainting.factory import is_gemini_provider_configured, is_replicate_provider_configured
+from app.services.inpainting.factory import (
+    is_gemini_provider_configured,
+    is_grok_provider_configured,
+    is_pollinations_provider_configured,
+    is_replicate_provider_configured,
+)
 
 router = APIRouter(tags=["ai-edit"])
 
@@ -28,6 +33,24 @@ def ai_status() -> AiStatusResponse:
             provider="gemini",
             configured=configured,
             model=settings.gemini_model if configured else None,
+            supportsMaskless=True,
+        )
+
+    if provider == "pollinations":
+        configured = is_pollinations_provider_configured()
+        return AiStatusResponse(
+            provider="pollinations",
+            configured=configured,
+            model=settings.pollinations_image_model if configured else None,
+            supportsMaskless=True,
+        )
+
+    if provider == "grok":
+        configured = is_grok_provider_configured()
+        return AiStatusResponse(
+            provider="grok",
+            configured=configured,
+            model=settings.grok_image_model if configured else None,
             supportsMaskless=True,
         )
 

@@ -34,6 +34,14 @@ def is_gemini_provider_configured() -> bool:
     return bool(settings.gemini_api_key)
 
 
+def is_pollinations_provider_configured() -> bool:
+    return bool(settings.pollinations_api_key)
+
+
+def is_grok_provider_configured() -> bool:
+    return bool(settings.grok_api_key)
+
+
 # Backward-compat alias -- "real" has meant "Replicate" since Sprint 4.
 is_real_provider_configured = is_replicate_provider_configured
 
@@ -55,6 +63,28 @@ def get_inpainting_provider() -> InpaintingProvider:
 
         return GeminiImageProvider()
 
+    if provider_name == "pollinations":
+        if not is_pollinations_provider_configured():
+            raise ProviderNotConfiguredError(
+                "AI_PROVIDER=pollinations is set, but ASTRA_POLLINATIONS_API_KEY is not configured. "
+                "Set it in backend/.env, or set AI_PROVIDER=mock to use the mock provider "
+                "for local development. See POLLINATIONS_INTEGRATION.md for exact setup instructions."
+            )
+        from app.services.inpainting.pollinations_provider import PollinationsProvider
+
+        return PollinationsProvider()
+
+    if provider_name == "grok":
+        if not is_grok_provider_configured():
+            raise ProviderNotConfiguredError(
+                "AI_PROVIDER=grok is set, but ASTRA_GROK_API_KEY is not configured. "
+                "Set it in backend/.env, or set AI_PROVIDER=mock to use the mock provider "
+                "for local development. See GROK_INTEGRATION.md for exact setup instructions."
+            )
+        from app.services.inpainting.grok_provider import GrokImageProvider
+
+        return GrokImageProvider()
+
     if provider_name == "real":
         if not is_replicate_provider_configured():
             raise ProviderNotConfiguredError(
@@ -67,5 +97,5 @@ def get_inpainting_provider() -> InpaintingProvider:
         return RealGenerativeAIProvider()
 
     raise UnknownProviderError(
-        f"Unknown AI_PROVIDER '{provider_name}'. Valid values: 'mock', 'gemini', 'real'."
+        f"Unknown AI_PROVIDER '{provider_name}'. Valid values: 'mock', 'gemini', 'pollinations', 'grok', 'real'."
     )
