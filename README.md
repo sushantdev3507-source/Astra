@@ -1,6 +1,6 @@
 # Astra — Sprint 4 + Gemini AI Edit Integration
 
-Astra is the web-based asset editing tool for **Sonal.ai**. Sprint 1 built the
+Astra is the web-based asset editing tool for **5onam.ai**. Sprint 1 built the
 full-stack foundation. Sprint 2 added a real HTML5 Canvas editing engine.
 Sprint 3 added AI Edit (mock provider), session recovery, and layers.
 Sprint 4 added a Replicate/FLUX.1 Fill provider adapter, an async job
@@ -53,11 +53,11 @@ here and how to run it.
 - **Session recovery** — edits autosave to IndexedDB; reopening the editor
   offers to restore your last session
 
-**Sonal.ai integration readiness:**
+**5onam.ai integration readiness:**
 - `/editor?assetId=<id>` or `/editor?assetUrl=<url>&assetType=image` — Astra
   can be launched with an external asset reference instead of a local upload
-- `/dev/launch-astra` — a dev-only page that simulates "Sonal.ai launches
-  Astra", for exercising that path without a real Sonal.ai integration
+- `/dev/launch-astra` — a dev-only page that simulates "5onam.ai launches
+  Astra", for exercising that path without a real 5onam.ai integration
 - `AstraLaunchContext` / `AstraEditResult` — typed contracts for the launch
   and save/return flows (see `frontend/lib/integration/`)
 - `/api/v1/...` API versioning, with `/api/...` kept working for
@@ -69,7 +69,7 @@ here and how to run it.
 - PDF / PPTX editing
 - Authentication, user accounts, database, cloud storage
 - Real-time collaboration
-- A real Sonal.ai production API integration (only the local
+- A real 5onam.ai production API integration (only the local
   interfaces/contracts + mock dev flow exist, intentionally)
 
 ---
@@ -77,7 +77,7 @@ here and how to run it.
 ## Architecture
 
 ```text
-Sonal.ai (future)
+5onam.ai (future)
    │  launches with ?assetId=... or ?assetUrl=...
    ▼
 Astra Frontend (Next.js, :3000)
@@ -126,7 +126,7 @@ astra/
 │   ├── app/
 │   │   ├── page.tsx            # Landing page
 │   │   ├── editor/page.tsx     # /editor — reads launch query params
-│   │   └── dev/launch-astra/   # Dev-only mock Sonal.ai launch page
+│   │   └── dev/launch-astra/   # Dev-only mock 5onam.ai launch page
 │   ├── components/editor/      # Header, Toolbar, Canvas, PropertiesPanel, StatusBar
 │   ├── lib/
 │   │   ├── api/                 # client.ts, assets.ts, health.ts
